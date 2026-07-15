@@ -20,7 +20,26 @@
         }
         
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding: 20px; margin: 0; }
+        body { background-color: var(--bg); color: var(--text); padding: 0; margin: 0; min-height: 100vh; position: relative;}
+        
+        /* ======== TELA DE LOGIN ======== */
+        .login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(43, 58, 74, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; backdrop-filter: blur(8px);
+        }
+        .login-box {
+            background: var(--card-bg); padding: 40px; border-radius: var(--radius-card);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center;
+        }
+        .login-box h2 { display: block; text-align: center; margin-bottom: 25px; }
+        .login-box input { width: 100%; margin-bottom: 15px; }
+        .login-box button { width: 100%; background: linear-gradient(135deg, #00b4d8, #0077b6); font-size: 1.1em; padding: 14px; }
+        #app-wrapper { padding: 20px; transition: filter 0.3s ease; }
+        .is-blurred { filter: blur(10px); pointer-events: none; user-select: none; overflow: hidden; height: 100vh;}
+        /* =============================== */
+
         .container { max-width: 1000px; margin: 0 auto; }
         
         h1 { color: var(--primary); font-weight: 800; text-align: center; margin-bottom: 30px; letter-spacing: -0.5px; }
@@ -35,28 +54,21 @@
         input, select { padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95em; transition: all 0.3s; background: #f8fafc; }
         input:focus, select:focus { border-color: var(--secondary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15); }
         
-        /* Estilização dos Botões Coloridos e Redondos */
-        button, .btn-upload { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: var(--radius-btn); cursor: pointer; font-weight: 700; color: white; font-size: 0.95em; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        button:hover, .btn-upload:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        button:active, .btn-upload:active { transform: translateY(0); }
+        button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: var(--radius-btn); cursor: pointer; font-weight: 700; color: white; font-size: 0.95em; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        button:active { transform: translateY(0); }
         
         .btn-save { background: linear-gradient(135deg, #2ec4b6, #0cbaba); }
-        .btn-load { background: linear-gradient(135deg, #00b4d8, #0077b6); display: inline-flex; }
         .btn-add { background: linear-gradient(135deg, #ff9f1c, #ff6b6b); width: 100%; margin-top: 15px; padding: 14px; }
         .btn-delete { background: var(--danger); padding: 6px 12px; font-size: 0.85em; border-radius: 8px; box-shadow: none; }
         .btn-delete:hover { background: #e02454; box-shadow: none; }
         
-        /* Botões de Status de Pagamento */
         .btn-status { padding: 6px 14px; font-size: 0.85em; border-radius: 20px; box-shadow: none; }
         .status-pago { background-color: rgba(46, 196, 182, 0.15); color: #11998e; border: 1px solid #2ec4b6; }
         .status-pago:hover { background-color: #2ec4b6; color: white; }
         .status-pendente { background-color: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid var(--danger); }
         .status-pendente:hover { background-color: var(--danger); color: white; }
         
-        /* Input de arquivo escondido e estilizado */
-        input[type="file"] { display: none; }
-        
-        /* Mini Cards de Resumo */
         .resumo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .mini-card { padding: 15px; border-radius: 12px; background: #f8fafc; border-left: 5px solid #cbd5e0; }
         .mini-card.total { border-left-color: var(--secondary); }
@@ -81,202 +93,170 @@
         .filtro-mes { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 8px 16px; border-radius: 30px; border: 2px solid #e2e8f0; }
         .filtro-mes select { border: none; background: transparent; padding: 0; font-weight: bold; color: var(--primary); cursor: pointer; }
         .filtro-mes select:focus { box-shadow: none; }
-
-        /* Estilo para o rodapé discreto */
         .rodape-info { text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0; font-size: 0.9em; color: #718096; line-height: 1.6; }
 
         @media (max-width: 650px) {
             .grid { grid-template-columns: 1fr; }
             th, td { padding: 10px 8px; font-size: 0.85em; }
-            button, .btn-upload { width: 100%; }
+            button { width: 100%; }
             .rodape-info { text-align: center; }
         }
 
-
-/* =========================================
-           ESTILOS EXCLUSIVOS PARA IMPRESSÃO 
-           ========================================= */
-        #area-impressao {
-            display: none;
-        }
-        
+        #area-impressao { display: none; }
         @media print {
-            /* Esconde o sistema principal completamente, removendo o espaço em branco */
-            body > .container {
-                display: none !important;
-            }
-            
-            /* Exibe apenas a área do relatório */
-            #area-impressao {
-                display: block !important;
-                position: relative;
-                width: 100%;
-                background: white;
-            }
-            
-            @page {
-                margin: 1.5cm;
-            }
-            
-            .print-card {
-                border: 1px solid #e2e8f0;
-                padding: 15px;
-                border-radius: 10px;
-                text-align: center;
-                flex: 1;
-            }
-            .print-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 15px;
-                font-size: 0.9em;
-            }
-            .print-table th, .print-table td {
-                border: 1px solid #cbd5e0;
-                padding: 8px 12px;
-                text-align: left;
-            }
-            .print-table th {
-                background-color: #f8fafc;
-                color: #2b3a4a;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            body > #app-wrapper { display: none !important; }
+            .login-overlay { display: none !important; }
+            #area-impressao { display: block !important; position: relative; width: 100%; background: white; }
+            @page { margin: 1.5cm; }
+            .print-card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 10px; text-align: center; flex: 1; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+            .print-table th, .print-table td { border: 1px solid #cbd5e0; padding: 8px 12px; text-align: left; }
+            .print-table th { background-color: #f8fafc; color: #2b3a4a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Controle Financeiro Familiar</h1>
-    
-    <div class="card" style="background: linear-gradient(to right, #ffffff, #f7fafc);">
-        <h2>⚙️ Gestão de Dados Locais</h2>
-        <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
-            <button class="btn-save" onclick="salvarDados()">💾 Salvar Dados (Baixar .json)</button>
-            <label for="fileInput" class="btn-upload btn-load">📁 Carregar Arquivo de Save</label>
-            <input type="file" id="fileInput" accept=".json" onchange="carregarDados(event)">
-        </div>
+<!-- OVERLAY DE LOGIN -->
+<div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+        <h2>🔒 Acesso</h2>
+        <input type="text" id="inp-user" placeholder="Usuário">
+        <input type="password" id="inp-pass" placeholder="Senha">
+        <button id="btn-login" onclick="fazerLogin()">Entrar no Sistema</button>
+        <p id="msg-login" style="color: var(--danger); font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
     </div>
+</div>
 
-    <div class="card">
-        <h2>💰 Entrada de Rendas (Mensal)</h2>
-        <div class="grid grid-4">
-            <div class="form-group">
-                <label>Minha Renda</label>
-                <input type="number" id="renda-minha" value="0" oninput="atualizarDashboard()">
-            </div>
-            <div class="form-group">
-                <label>Renda Esposa</label>
-                <input type="number" id="renda-esposa" value="0" oninput="atualizarDashboard()">
-            </div>
-            <div class="form-group">
-                <label>Meus Extras</label>
-                <input type="number" id="extra-meu" value="0" oninput="atualizarDashboard()">
-            </div>
-            <div class="form-group">
-                <label>Extras Esposa</label>
-                <input type="number" id="extra-esposa" value="0" oninput="atualizarDashboard()">
-            </div>
+<!-- CORPO DO APP -->
+<div id="app-wrapper" class="is-blurred">
+    <div class="container">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h1>Controle Financeiro Familiar</h1>
+            <!-- Novo botão de salvar no banco de dados -->
+            <button class="btn-save" onclick="salvarNoBanco()" style="margin-bottom: 20px;" id="btn-salvar-nuvem">💾 Salvar Alterações na Nuvem</button>
         </div>
-        <h3 style="text-align: right; color: var(--success); margin-top: 20px; font-weight: 800;">Renda Total: <span id="renda-total-display">R$ 0,00</span></h3>
-    </div>
 
-    <div class="card">
-        <h2>🛍️ Cadastrar Conta / Carnê Parcelado</h2>
-        <div class="grid">
-            <div class="form-group" style="grid-column: span 2;">
-                <label>Descrição da Conta</label>
-                <input type="text" id="desc-conta" placeholder="Ex: Cartão de Crédito, Financiamento, Faculdade...">
-            </div>
-            <div class="form-group">
-                <label>Valor da Parcela (R$)</label>
-                <input type="number" id="valor-conta" placeholder="0.00">
-            </div>
-        </div>
-        <div class="grid" style="margin-top: 15px;">
-            <div class="form-group">
-                <label>Dia do Vencimento</label>
-                <input type="number" id="vencimento-conta" min="1" max="31" placeholder="Ex: 10">
-            </div>
-            <div class="form-group">
-                <label>Mês de Início (Base)</label>
-                <select id="mes-base">
-                    <option value="0">Janeiro</option><option value="1">Fevereiro</option>
-                    <option value="2">Março</option><option value="3">Abril</option>
-                    <option value="4">Maio</option><option value="5">Junho</option>
-                    <option value="6">Julho</option><option value="7">Agosto</option>
-                    <option value="8">Setembro</option><option value="9">Outubro</option>
-                    <option value="10">Novembro</option><option value="11">Dezembro</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Nº da Parcela (Neste Mês)</label>
-                <input type="number" id="parcela-atual" min="1" value="1">
-            </div>
-            <div class="form-group">
-                <label>Total de Parcelas</label>
-                <input type="number" id="total-parcelas" min="1" value="1">
-            </div>
-        </div>
-        <button class="btn-add" onclick="adicionarConta()">✨ Adicionar ao Planejamento</button>
-    </div>
-
-    <div class="card">
-        <div class="header-tabela">
-            <h2>📋 Extrato de Contas</h2>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <div class="filtro-mes">
-                    <label for="filtro-mes-view">📅 Mês:</label>
-                    <select id="filtro-mes-view" onchange="atualizarDashboard()"></select>
+        <div class="card">
+            <h2>💰 Entrada de Rendas (Mensal)</h2>
+            <div class="grid grid-4">
+                <div class="form-group">
+                    <label>Minha Renda</label>
+                    <input type="number" id="renda-minha" value="0" oninput="atualizarDashboard()">
                 </div>
-                <button class="btn-save" onclick="imprimirRelatorio()" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: none; padding: 8px 16px;">🖨️ Imprimir</button>
+                <div class="form-group">
+                    <label>Renda Conjuge</label>
+                    <input type="number" id="renda-esposa" value="0" oninput="atualizarDashboard()">
+                </div>
+                <div class="form-group">
+                    <label>Meus Extras</label>
+                    <input type="number" id="extra-meu" value="0" oninput="atualizarDashboard()">
+                </div>
+                <div class="form-group">
+                    <label>Extras Conjuge</label>
+                    <input type="number" id="extra-esposa" value="0" oninput="atualizarDashboard()">
+                </div>
             </div>
+            <h3 style="text-align: right; color: var(--success); margin-top: 20px; font-weight: 800;">Renda Total: <span id="renda-total-display">R$ 0,00</span></h3>
         </div>
-        
-        <div class="resumo-cards">
-            <div class="mini-card total">
-                <p>Total do Mês</p>
-                <h4 id="resumo-total">R$ 0,00</h4>
-            </div>
-            <div class="mini-card pago">
-                <p>Já Pago</p>
-                <h4 id="resumo-pago" style="color: #11998e;">R$ 0,00</h4>
-            </div>
-            <div class="mini-card restante">
-                <p>Restante a Pagar</p>
-                <h4 id="resumo-restante" style="color: var(--danger);">R$ 0,00</h4>
-            </div>
-        </div>
-        
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Venc.</th>
-                        <th>Descrição</th>
-                        <th>Parcela</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th style="text-align: center;">Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-contas"></tbody>
-            </table>
-            
-            <div id="rodape-saldo-parcial" class="rodape-info"></div>
-        </div>
-    </div>
 
-    <div class="card">
-        <h2>📈 Projeção Anual de Dinheiro Livre (Sobra Líquida)</h2>
-        <div class="chart-container">
-            <canvas id="graficoSobra"></canvas>
+        <div class="card">
+            <h2>🛍️ Cadastrar Conta / Carnê Parcelado</h2>
+            <div class="grid">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Descrição da Conta</label>
+                    <input type="text" id="desc-conta" placeholder="Ex: Cartão de Crédito, Financiamento, Faculdade...">
+                </div>
+                <div class="form-group">
+                    <label>Valor da Parcela (R$)</label>
+                    <input type="number" id="valor-conta" placeholder="0.00">
+                </div>
+            </div>
+            <div class="grid" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Dia do Vencimento</label>
+                    <input type="number" id="vencimento-conta" min="1" max="31" placeholder="Ex: 10">
+                </div>
+                <div class="form-group">
+                    <label>Mês de Início (Base)</label>
+                    <select id="mes-base">
+                        <option value="0">Janeiro</option><option value="1">Fevereiro</option>
+                        <option value="2">Março</option><option value="3">Abril</option>
+                        <option value="4">Maio</option><option value="5">Junho</option>
+                        <option value="6">Julho</option><option value="7">Agosto</option>
+                        <option value="8">Setembro</option><option value="9">Outubro</option>
+                        <option value="10">Novembro</option><option value="11">Dezembro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nº da Parcela (Neste Mês)</label>
+                    <input type="number" id="parcela-atual" min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Total de Parcelas</label>
+                    <input type="number" id="total-parcelas" min="1" value="1">
+                </div>
+            </div>
+            <button class="btn-add" onclick="adicionarConta()">✨ Adicionar ao Planejamento</button>
+        </div>
+
+        <div class="card">
+            <div class="header-tabela">
+                <h2>📋 Extrato de Contas</h2>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div class="filtro-mes">
+                        <label for="filtro-mes-view">📅 Mês:</label>
+                        <select id="filtro-mes-view" onchange="atualizarDashboard()"></select>
+                    </div>
+                    <button class="btn-save" onclick="imprimirRelatorio()" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: none; padding: 8px 16px;">🖨️ Imprimir</button>
+                </div>
+            </div>
+            
+            <div class="resumo-cards">
+                <div class="mini-card total">
+                    <p>Total do Mês</p>
+                    <h4 id="resumo-total">R$ 0,00</h4>
+                </div>
+                <div class="mini-card pago">
+                    <p>Já Pago</p>
+                    <h4 id="resumo-pago" style="color: #11998e;">R$ 0,00</h4>
+                </div>
+                <div class="mini-card restante">
+                    <p>Restante a Pagar</p>
+                    <h4 id="resumo-restante" style="color: var(--danger);">R$ 0,00</h4>
+                </div>
+            </div>
+            
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Venc.</th>
+                            <th>Descrição</th>
+                            <th>Parcela</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-contas"></tbody>
+                </table>
+                <div id="rodape-saldo-parcial" class="rodape-info"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📈 Projeção Anual de Dinheiro Livre (Sobra Líquida)</h2>
+            <div class="chart-container">
+                <canvas id="graficoSobra"></canvas>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="area-impressao">
+    <!-- Estrutura de impressão original mantida -->
     <h1 style="text-align: center; color: var(--primary); margin-bottom: 5px;">Relatório Financeiro</h1>
     <h3 style="text-align: center; color: #718096; margin-top: 0;">Mês de Referência: <span id="print-mes"></span></h3>
     
@@ -324,6 +304,13 @@
 </div>
 
 <script>
+    // ========= CONFIGURAÇÃO DO BANCO DE DADOS (GOOGLE SHEETS) =========
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoY0m8VV6wZaGeeNPfXJQKW9jMrRGWLv3JmW4uDJKPtHvXaXItCiH0KXpUXkZMqR62/exec'; // <--- COLOQUE SUA URL AQUI
+    
+    // Variáveis Globais de Sessão
+    let sessionUser = "";
+    let sessionPass = "";
+
     let appData = {
         rendas: { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 },
         contas: [] 
@@ -332,6 +319,7 @@
     const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const mesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     let meuGrafico = null;
+    let graficoPrintPie = null;
 
     document.addEventListener("DOMContentLoaded", () => {
         const mesAtual = new Date().getMonth();
@@ -344,9 +332,96 @@
             selectFiltro.appendChild(opt);
         });
         document.getElementById('mes-base').value = mesAtual;
-        atualizarDashboard();
     });
 
+    // ========= LÓGICA DE LOGIN E BANCO DE DADOS =========
+    async function fazerLogin() {
+        const user = document.getElementById('inp-user').value;
+        const pass = document.getElementById('inp-pass').value;
+        const msg = document.getElementById('msg-login');
+        const btn = document.getElementById('btn-login');
+
+        if(!user || !pass) {
+            msg.innerText = "Preencha usuário e senha!";
+            return;
+        }
+
+        btn.innerText = "Autenticando...";
+        msg.innerText = "";
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', user: user, pass: pass })
+            });
+
+            const result = await response.json();
+
+            if(result.status === 'success') {
+                sessionUser = user;
+                sessionPass = pass;
+                
+                // Se a família já tiver dados salvos, nós carregamos
+                if(result.data) {
+                    appData = JSON.parse(result.data);
+                    
+                    // Tratamento preventivo para arrays faltantes
+                    if(!appData.contas) appData.contas = [];
+                    appData.contas.forEach(c => { 
+                        if(!c.pagas) c.pagas = []; 
+                        if(!c.excecoes) c.excecoes = {}; 
+                    });
+
+                    // Preencher os inputs visuais de renda
+                    document.getElementById('renda-minha').value = appData.rendas.minha || 0;
+                    document.getElementById('renda-esposa').value = appData.rendas.esposa || 0;
+                    document.getElementById('extra-meu').value = appData.rendas.extraMeu || 0;
+                    document.getElementById('extra-esposa').value = appData.rendas.extraEsposa || 0;
+                }
+
+                // Libera a interface
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('app-wrapper').classList.remove('is-blurred');
+                atualizarDashboard();
+
+            } else {
+                msg.innerText = result.message || "Credenciais inválidas.";
+            }
+        } catch(error) {
+            msg.innerText = "Erro ao conectar com o banco de dados.";
+            console.error(error);
+        } finally {
+            btn.innerText = "Entrar no Sistema";
+        }
+    }
+
+    async function salvarNoBanco() {
+        const btn = document.getElementById('btn-salvar-nuvem');
+        btn.innerText = "⏳ Salvando...";
+        
+        capturarRendas();
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'save', user: sessionUser, pass: sessionPass, data: appData })
+            });
+            const result = await response.json();
+
+            if(result.status === 'success') {
+                btn.innerText = "✅ Salvo com Sucesso!";
+                setTimeout(() => { btn.innerText = "💾 Salvar Alterações na Nuvem"; }, 3000);
+            } else {
+                alert("Erro ao salvar: " + result.message);
+                btn.innerText = "💾 Salvar Alterações na Nuvem";
+            }
+        } catch(error) {
+            alert("Falha de conexão.");
+            btn.innerText = "💾 Salvar Alterações na Nuvem";
+        }
+    }
+
+    // ========= LÓGICA EXISTENTE DO APP (MANTIDA) =========
     function capturarRendas() {
         appData.rendas.minha = parseFloat(document.getElementById('renda-minha').value) || 0;
         appData.rendas.esposa = parseFloat(document.getElementById('renda-esposa').value) || 0;
@@ -370,17 +445,7 @@
             return;
         }
 
-        appData.contas.push({ 
-            id: Date.now(), 
-            desc, 
-            valor, 
-            venc, 
-            mesBase, 
-            parcelaAtual, 
-            totalParcelas,
-            pagas: [],
-            excecoes: {} 
-        });
+        appData.contas.push({ id: Date.now(), desc, valor, venc, mesBase, parcelaAtual, totalParcelas, pagas: [], excecoes: {} });
         
         document.getElementById('desc-conta').value = '';
         document.getElementById('valor-conta').value = '';
@@ -397,18 +462,13 @@
     function togglePago(id, mesIndex) {
         let conta = appData.contas.find(c => c.id === id);
         if(!conta.pagas) conta.pagas = [];
-        
-        if(conta.pagas.includes(mesIndex)) {
-            conta.pagas = conta.pagas.filter(m => m !== mesIndex);
-        } else {
-            conta.pagas.push(mesIndex);
-        }
+        if(conta.pagas.includes(mesIndex)) { conta.pagas = conta.pagas.filter(m => m !== mesIndex); } 
+        else { conta.pagas.push(mesIndex); }
         atualizarDashboard();
     }
 
     function editarCampo(id, mesIndex, campo) {
         let conta = appData.contas.find(c => c.id === id);
-        
         if (!conta.excecoes) conta.excecoes = {};
         if (!conta.excecoes[mesIndex]) conta.excecoes[mesIndex] = {};
 
@@ -416,20 +476,13 @@
 
         if (campo === 'desc') {
             let novoDesc = prompt(`Editar descrição apenas para o mês de ${meses[mesIndex]}:`, valorAtual);
-            if (novoDesc !== null && novoDesc.trim() !== "") {
-                conta.excecoes[mesIndex].desc = novoDesc.trim();
-                atualizarDashboard();
-            }
+            if (novoDesc !== null && novoDesc.trim() !== "") { conta.excecoes[mesIndex].desc = novoDesc.trim(); atualizarDashboard(); }
         } else if (campo === 'valor') {
             let novoValor = prompt(`Editar valor (R$) apenas para o mês de ${meses[mesIndex]}:`, valorAtual);
             if (novoValor !== null) {
                 novoValor = parseFloat(novoValor.replace(',', '.'));
-                if (!isNaN(novoValor)) {
-                    conta.excecoes[mesIndex].valor = novoValor;
-                    atualizarDashboard();
-                } else {
-                    alert("Por favor, digite um número válido.");
-                }
+                if (!isNaN(novoValor)) { conta.excecoes[mesIndex].valor = novoValor; atualizarDashboard(); }
+                else { alert("Por favor, digite um número válido."); }
             }
         }
     }
@@ -455,16 +508,12 @@
 
             if(parcelaCalculada >= 1 && parcelaCalculada <= c.totalParcelas) {
                 let estaPaga = c.pagas && c.pagas.includes(mesFiltro);
-                
                 let descAtual = (c.excecoes && c.excecoes[mesFiltro] && c.excecoes[mesFiltro].desc !== undefined) ? c.excecoes[mesFiltro].desc : c.desc;
                 let valorAtual = (c.excecoes && c.excecoes[mesFiltro] && c.excecoes[mesFiltro].valor !== undefined) ? c.excecoes[mesFiltro].valor : c.valor;
 
                 contasExibicao.push({ ...c, parcelaCalculada, estaPaga, descAtual, valorAtual });
-                
                 totalDoMes += valorAtual;
-                if(estaPaga) {
-                    totalPago += valorAtual;
-                }
+                if(estaPaga) totalPago += valorAtual;
             }
         });
 
@@ -477,7 +526,6 @@
         contasExibicao.sort((a, b) => a.venc - b.venc).forEach(c => {
             let tr = document.createElement('tr');
             if(c.estaPaga) tr.className = "linha-paga";
-
             tr.innerHTML = `
                 <td><strong>Dia ${String(c.venc).padStart(2, '0')}</strong></td>
                 <td style="cursor: pointer;" title="Clique para editar neste mês" onclick="editarCampo(${c.id}, ${mesFiltro}, 'desc')">
@@ -497,33 +545,19 @@
             tbody.appendChild(tr);
         });
 
-        if(contasExibicao.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: #a0aec0; padding: 30px;">Nenhuma conta projetada para este mês.</td></tr>`;
-        }
+        if(contasExibicao.length === 0) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: #a0aec0; padding: 30px;">Nenhuma conta projetada para este mês.</td></tr>`;
 
         let saldoAtualNoBolso = rendaTotal - totalPago;
         let projecaoFinal = saldoAtualNoBolso - restanteAPagar; 
         
-        let corProjecao = projecaoFinal >= 0 ? "var(--success)" : "var(--danger)";
-        let textoProjecao = projecaoFinal >= 0 ? "Sobra livre no fim do mês" : "Faltará";
-
         document.getElementById('rodape-saldo-parcial').innerHTML = `
-            <div style="margin-bottom: 6px;">
-                💡 <strong>Saldo Parcial:</strong> Renda (<strong>${rendaTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) 
-                - Já pago (<strong>${totalPago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) 
-                = No bolso agora: <span style="color: var(--primary); font-weight: bold; font-size: 1.1em;">${saldoAtualNoBolso.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-            </div>
-            <div>
-                🎯 <strong>Projeção:</strong> No bolso agora (<strong>${saldoAtualNoBolso.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) 
-                - Restante a pagar (<strong>${restanteAPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) 
-                = ${textoProjecao}: <span style="color: ${corProjecao}; font-weight: 900; font-size: 1.15em;">${projecaoFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-            </div>
+            <div style="margin-bottom: 6px;">💡 <strong>Saldo Parcial:</strong> Renda (<strong>${rendaTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) - Já pago (<strong>${totalPago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) = No bolso agora: <span style="color: var(--primary); font-weight: bold; font-size: 1.1em;">${saldoAtualNoBolso.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></div>
+            <div>🎯 <strong>Projeção:</strong> No bolso agora (<strong>${saldoAtualNoBolso.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) - Restante a pagar (<strong>${restanteAPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>) = ${projecaoFinal >= 0 ? "Sobra livre no fim do mês" : "Faltará"}: <span style="color: ${projecaoFinal >= 0 ? "var(--success)" : "var(--danger)"}; font-weight: 900; font-size: 1.15em;">${projecaoFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span></div>
         `;
     }
 
     function renderizarGrafico(rendaTotal) {
         let gastosPorMes = new Array(12).fill(0);
-        
         appData.contas.forEach(c => {
             for(let m = 0; m < 12; m++) {
                 let diff = m - c.mesBase;
@@ -534,182 +568,61 @@
                 }
             }
         });
-
         let sobraPorMes = gastosPorMes.map(gasto => rendaTotal - gasto);
 
         const ctx = document.getElementById('graficoSobra').getContext('2d');
         if (meuGrafico) meuGrafico.destroy(); 
-
         let gradientFill = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientFill.addColorStop(0, 'rgba(0, 180, 216, 0.3)');
-        gradientFill.addColorStop(1, 'rgba(0, 180, 216, 0.0)');
+        gradientFill.addColorStop(0, 'rgba(0, 180, 216, 0.3)'); gradientFill.addColorStop(1, 'rgba(0, 180, 216, 0.0)');
 
         meuGrafico = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: mesesCurtos,
-                datasets: [{
-                    label: 'Sobra Líquida (R$)',
-                    data: sobraPorMes,
-                    backgroundColor: gradientFill,
-                    borderColor: '#00b4d8',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.35,
-                    pointBackgroundColor: '#2ec4b6',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { grid: { color: 'rgba(0,0,0,0.03)' }, beginAtZero: true },
-                    x: { grid: { display: false } }
-                }
-            }
+            type: 'line', data: { labels: mesesCurtos, datasets: [{ label: 'Sobra Líquida (R$)', data: sobraPorMes, backgroundColor: gradientFill, borderColor: '#00b4d8', borderWidth: 3, fill: true, tension: 0.35, pointBackgroundColor: '#2ec4b6', pointRadius: 4, pointHoverRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(0,0,0,0.03)' }, beginAtZero: true }, x: { grid: { display: false } } } }
         });
     }
 
-    function salvarDados() {
-        capturarRendas();
-        const dataStr = JSON.stringify(appData);
-        const blob = new Blob([dataStr], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `meu_save_financeiro_${new Date().toISOString().slice(0,10)}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    function carregarDados(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const loadedData = JSON.parse(e.target.result);
-                if(loadedData.rendas && loadedData.contas) {
-                    appData = loadedData;
-                    
-                    appData.contas.forEach(c => { 
-                        if(!c.pagas) c.pagas = []; 
-                        if(!c.excecoes) c.excecoes = {}; 
-                    });
-
-                    document.getElementById('renda-minha').value = appData.rendas.minha;
-                    document.getElementById('renda-esposa').value = appData.rendas.esposa;
-                    document.getElementById('extra-meu').value = appData.rendas.extraMeu;
-                    document.getElementById('extra-esposa').value = appData.rendas.extraEsposa;
-                    
-                    atualizarDashboard();
-                    alert("Seu 'Save' foi carregado com sucesso!");
-                } else {
-                    alert("Arquivo com estrutura inválida.");
-                }
-            } catch (error) {
-                alert("Erro ao processar o arquivo.");
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    // Variável global para o gráfico da impressão
-    let graficoPrintPie = null;
-
     function imprimirRelatorio() {
-        // 1. Identificar o mês filtrado e rendas
         const mesFiltroIndex = parseInt(document.getElementById('filtro-mes-view').value);
         const nomeMes = meses[mesFiltroIndex];
         const receitaTotal = capturarRendas();
-        
         let despesasTotal = 0;
         let contasDoMes = [];
 
-        // 2. Extrair e calcular apenas as despesas do mês selecionado
         appData.contas.forEach(c => {
             let diffMeses = mesFiltroIndex - c.mesBase;
             let parcelaCalculada = c.parcelaAtual + diffMeses;
-
             if(parcelaCalculada >= 1 && parcelaCalculada <= c.totalParcelas) {
                 let estaPaga = c.pagas && c.pagas.includes(mesFiltroIndex);
                 let descAtual = (c.excecoes && c.excecoes[mesFiltroIndex] && c.excecoes[mesFiltroIndex].desc !== undefined) ? c.excecoes[mesFiltroIndex].desc : c.desc;
                 let valorAtual = (c.excecoes && c.excecoes[mesFiltroIndex] && c.excecoes[mesFiltroIndex].valor !== undefined) ? c.excecoes[mesFiltroIndex].valor : c.valor;
-
                 despesasTotal += valorAtual;
-                contasDoMes.push({ 
-                    venc: c.venc, 
-                    desc: descAtual, 
-                    parcela: `${parcelaCalculada}/${c.totalParcelas}`, 
-                    valor: valorAtual, 
-                    status: estaPaga ? 'Pago' : 'Pendente' 
-                });
+                contasDoMes.push({ venc: c.venc, desc: descAtual, parcela: `${parcelaCalculada}/${c.totalParcelas}`, valor: valorAtual, status: estaPaga ? 'Pago' : 'Pendente' });
             }
         });
 
         let saldoMes = receitaTotal - despesasTotal;
-
-        // 3. Preencher os dados de texto na área de impressão
         document.getElementById('print-mes').innerText = nomeMes;
         document.getElementById('print-receita').innerText = receitaTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         document.getElementById('print-despesas').innerText = despesasTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         document.getElementById('print-saldo').innerText = saldoMes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         document.getElementById('print-saldo').style.color = saldoMes >= 0 ? 'var(--secondary)' : 'var(--danger)';
 
-        // 4. Preencher a tabela detalhada
         let tbodyPrint = document.getElementById('print-tabela-corpo');
         tbodyPrint.innerHTML = '';
         contasDoMes.sort((a, b) => a.venc - b.venc).forEach(c => {
-            tbodyPrint.innerHTML += `
-                <tr>
-                    <td>Dia ${String(c.venc).padStart(2, '0')}</td>
-                    <td>${c.desc}</td>
-                    <td style="text-align: center;">${c.parcela}</td>
-                    <td style="text-align: right;">R$ ${c.valor.toFixed(2)}</td>
-                    <td style="text-align: center;">${c.status}</td>
-                </tr>
-            `;
+            tbodyPrint.innerHTML += `<tr><td>Dia ${String(c.venc).padStart(2, '0')}</td><td>${c.desc}</td><td style="text-align: center;">${c.parcela}</td><td style="text-align: right;">R$ ${c.valor.toFixed(2)}</td><td style="text-align: center;">${c.status}</td></tr>`;
         });
 
-        // 5. Gerar Gráfico de Pizza (Receitas x Despesas)
         const ctxPie = document.getElementById('graficoReceitaDespesaPrint').getContext('2d');
         if(graficoPrintPie) graficoPrintPie.destroy();
-        
         let sobraGrafico = saldoMes > 0 ? saldoMes : 0;
-        
-        graficoPrintPie = new Chart(ctxPie, {
-            type: 'doughnut',
-            data: {
-                labels: ['Despesas', 'Saldo Livre'],
-                datasets: [{
-                    data: [despesasTotal, sobraGrafico],
-                    backgroundColor: ['#ff3366', '#2ec4b6'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                animation: false, 
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
+        graficoPrintPie = new Chart(ctxPie, { type: 'doughnut', data: { labels: ['Despesas', 'Saldo Livre'], datasets: [{ data: [despesasTotal, sobraGrafico], backgroundColor: ['#ff3366', '#2ec4b6'], borderWidth: 0 }] }, options: { animation: false, responsive: true, maintainAspectRatio: false } });
 
-        // 6. Clonar o Gráfico de Análise Mensal (Linha) como Imagem
         const canvasAnual = document.getElementById('graficoSobra');
         const imgAnual = document.getElementById('print-grafico-anual');
         imgAnual.src = canvasAnual.toDataURL('image/png');
 
-        // 7. Disparar a janela de impressão com um pequeno delay para os gráficos renderizarem
-        setTimeout(() => {
-            window.print();
-        }, 300);
+        setTimeout(() => { window.print(); }, 300);
     }
 </script>
 
