@@ -16,7 +16,7 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 0; margin: 0; min-height: 100vh; }
         
-        /* ======== TELA DE LOGIN ======== */
+        /* ======== TELAS DE LOGIN / RECUPERAÇÃO ======== */
         .login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(43, 58, 74, 0.4); display: flex; align-items: center; justify-content: center;
@@ -29,21 +29,24 @@
         .login-box h2 { display: block; text-align: center; margin-bottom: 25px; }
         .login-box input { width: 100%; margin-bottom: 15px; }
         .login-box button { width: 100%; background: linear-gradient(135deg, #00b4d8, #0077b6); font-size: 1.1em; padding: 14px; }
+        
         #app-wrapper { padding: 20px; transition: filter 0.3s ease; }
         .is-blurred { filter: blur(10px); pointer-events: none; user-select: none; overflow: hidden; height: 100vh;}
-        /* =============================== */
+        /* ============================================== */
 
         .container { max-width: 1000px; margin: 0 auto; }
         
-        h1 { color: var(--primary); font-weight: 800; text-align: center; margin-bottom: 30px; letter-spacing: -0.5px; }
+        h1 { color: var(--primary); font-weight: 800; text-align: center; margin-bottom: 0; letter-spacing: -0.5px; }
         h2 { color: var(--primary); font-size: 1.4em; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         
-        /* Status de Salvamento */
+        /* Cabeçalho Topo */
+        .header-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 30px; gap: 15px; }
+        .user-panel { display: none; align-items: center; gap: 10px; background: white; padding: 8px 16px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        
         #status-salvamento {
             font-size: 0.9em; font-weight: 700; color: var(--success);
             background: #f8fafc; padding: 8px 16px; border-radius: 20px;
-            border: 1px solid #e2e8f0; margin-bottom: 20px;
-            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0; transition: all 0.3s ease; display: none;
         }
 
         .card { background: var(--card-bg); padding: 25px; border-radius: var(--radius-card); box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid rgba(0,0,0,0.02); }
@@ -62,6 +65,8 @@
         .btn-add { background: linear-gradient(135deg, #ff9f1c, #ff6b6b); width: 100%; margin-top: 15px; padding: 14px; }
         .btn-delete { background: var(--danger); padding: 6px 12px; font-size: 0.85em; border-radius: 8px; box-shadow: none; }
         .btn-print { background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 6px 12px; box-shadow: none; }
+        .btn-logout { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 6px 12px; font-size: 0.85em; box-shadow: none; }
+        .btn-logout:hover { background: var(--danger); color: white; }
         
         .btn-status { padding: 6px 14px; font-size: 0.85em; border-radius: 20px; box-shadow: none; }
         .status-pago { background-color: rgba(46, 196, 182, 0.15); color: #11998e; border: 1px solid #2ec4b6; }
@@ -95,16 +100,22 @@
         
         .rodape-info { text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0; font-size: 0.9em; color: #718096; line-height: 1.6; }
 
+        /* ======== CONFIGURAÇÕES DE IMPRESSÃO ======== */
         @media print {
-            body > #app-wrapper { display: none !important; }
-            .login-overlay { display: none !important; }
-            #area-impressao { display: block !important; position: relative; width: 100%; background: white; }
+            .login-overlay, #modal-recuperacao { display: none !important; }
+            #app-wrapper { filter: none !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
+            button:not(.btn-status) { display: none !important; } /* Esconde todos os botões, exceto o de status */
+            .user-panel, #status-salvamento { display: none !important; }
+            input, select { border: none !important; background: transparent !important; padding: 0 !important; color: black !important; font-weight: bold; -webkit-appearance: none; appearance: none; }
+            body { background: white !important; color: black !important; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin-bottom: 15px; }
+            .chart-container { break-inside: avoid; }
         }
-        #area-impressao { display: none; }
     </style>
 </head>
 <body>
 
+<!-- TELA DE LOGIN -->
 <div id="login-overlay" class="login-overlay">
     <div class="login-box">
         <h2>🔒 Acesso da Família</h2>
@@ -112,16 +123,37 @@
         <input type="password" id="inp-pass" placeholder="Senha">
         <button id="btn-login" onclick="fazerLogin()">Entrar no Sistema</button>
         <p id="msg-login" style="color: var(--danger); font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
+        <p style="margin-top: 20px; font-size: 0.85em; cursor: pointer; color: var(--secondary); text-decoration: underline;" onclick="abrirModalRecuperacao()">Esqueci minha senha</p>
+    </div>
+</div>
+
+<!-- TELA DE RECUPERAÇÃO DE SENHA -->
+<div id="modal-recuperacao" class="login-overlay" style="display: none;">
+    <div class="login-box">
+        <h2>Recuperar Senha</h2>
+        <p style="font-size: 0.9em; color: #718096; margin-bottom: 20px;">Digite seus dados para receber as instruções.</p>
+        <input type="email" id="rec-email" placeholder="Seu E-mail">
+        <input type="text" id="rec-cpf" placeholder="Seu CPF (Somente números)">
+        <button onclick="solicitarRecuperacao()" id="btn-recuperar">Enviar Solicitação</button>
+        <button onclick="fecharModalRecuperacao()" style="background: transparent; color: #718096; margin-top: 10px; box-shadow: none; border: 1px solid #e2e8f0;">Voltar ao Login</button>
+        <p id="msg-rec" style="font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
     </div>
 </div>
 
 <div id="app-wrapper" class="is-blurred">
     <div class="container">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <!-- CABEÇALHO COM NOME DO USUÁRIO E LOGOUT -->
+        <div class="header-main">
             <h1>Controle Financeiro</h1>
-            <!-- NOVO AVISO DE STATUS SUBSTITUINDO O BOTÃO -->
-            <div id="status-salvamento">✔️ Sincronizado</div>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="user-info" class="user-panel">
+                    <span style="font-size: 1.2em;">👤</span>
+                    <span id="display-username" style="font-weight: 800; color: var(--primary);">Usuário</span>
+                    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+                </div>
+                <div id="status-salvamento">✔️ Sincronizado</div>
+            </div>
         </div>
 
         <div class="card" style="background: #f8fafc; border-left: 4px solid var(--secondary);">
@@ -221,7 +253,7 @@
     let anoAtualSistema = new Date().getFullYear();
     let mesAtualSistema = new Date().getMonth();
     let meuGrafico = null;
-    let temporizadorSalvamento = null; // Variável para controlar o auto-save
+    let temporizadorSalvamento = null;
 
     document.addEventListener("DOMContentLoaded", () => {
         const selectsMes = ['filtro-mes-view', 'filtro-mes-extrato', 'mes-base'];
@@ -240,6 +272,65 @@
         });
     });
 
+    // SISTEMA DE RECUPERAÇÃO DE SENHA
+    function abrirModalRecuperacao() {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('modal-recuperacao').style.display = 'flex';
+        document.getElementById('msg-rec').innerText = '';
+    }
+
+    function fecharModalRecuperacao() {
+        document.getElementById('modal-recuperacao').style.display = 'none';
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+
+    async function solicitarRecuperacao() {
+        const email = document.getElementById('rec-email').value;
+        const cpf = document.getElementById('rec-cpf').value;
+        const msg = document.getElementById('msg-rec');
+        const btn = document.getElementById('btn-recuperar');
+
+        if(!email || !cpf) { 
+            msg.style.color = "var(--danger)";
+            msg.innerText = "Preencha E-mail e CPF!"; 
+            return; 
+        }
+
+        btn.innerText = "Enviando...";
+        
+        try {
+            // Envia requisição para o Apps Script
+            const response = await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'recover', email: email, cpf: cpf }) 
+            });
+            const result = await response.json();
+            
+            msg.style.color = "var(--success)";
+            msg.innerText = "Solicitação enviada! Se os dados estiverem corretos, você receberá um e-mail. (Requer configuração no Apps Script)";
+        } catch(error) {
+            msg.style.color = "var(--danger)";
+            msg.innerText = "Erro ao enviar solicitação. Verifique sua conexão.";
+        } finally {
+            btn.innerText = "Enviar Solicitação";
+        }
+    }
+
+    // LOGOUT
+    function fazerLogout() {
+        if(confirm("Deseja realmente sair?")) {
+            sessionUser = ""; 
+            sessionPass = "";
+            appData = { rendas: {}, contas: [] };
+            document.getElementById('inp-pass').value = ""; // Limpa a senha
+            
+            document.getElementById('user-info').style.display = 'none';
+            document.getElementById('status-salvamento').style.display = 'none';
+            document.getElementById('app-wrapper').classList.add('is-blurred');
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+    }
+
     // SISTEMA DE SALVAMENTO AUTOMÁTICO
     function autoSalvar() {
         const statusEl = document.getElementById('status-salvamento');
@@ -250,7 +341,7 @@
         
         temporizadorSalvamento = setTimeout(() => {
             executarSalvamentoNuvem();
-        }, 1500); // Aguarda 1.5s após a última alteração para salvar
+        }, 1500); 
     }
 
     async function executarSalvamentoNuvem() {
@@ -323,6 +414,11 @@
             if(result.status === 'success') {
                 sessionUser = user; sessionPass = pass;
                 
+                // Configura usuário logado no topo
+                document.getElementById('display-username').innerText = user.charAt(0).toUpperCase() + user.slice(1);
+                document.getElementById('user-info').style.display = 'flex';
+                document.getElementById('status-salvamento').style.display = 'block';
+                
                 if(result.data) {
                     let loadedData = JSON.parse(result.data);
                     
@@ -385,14 +481,14 @@
         appData.contas.push({ id: Date.now(), desc, valor, venc, mesBase, anoBase, parcelaAtual, totalParcelas, pagas: [], excecoes: {} });
         document.getElementById('desc-conta').value = ''; document.getElementById('valor-conta').value = '';
         atualizarDashboard();
-        autoSalvar(); // Chama o auto-save
+        autoSalvar(); 
     }
 
     function removerConta(id) {
         if(confirm("Deseja mesmo excluir esta conta permanentemente?")) {
             appData.contas = appData.contas.filter(c => c.id !== id);
             atualizarDashboard();
-            autoSalvar(); // Chama o auto-save
+            autoSalvar(); 
         }
     }
 
@@ -403,7 +499,7 @@
         if(conta.pagas.includes(chave)) { conta.pagas = conta.pagas.filter(m => m !== chave); } 
         else { conta.pagas.push(chave); }
         atualizarDashboard();
-        autoSalvar(); // Chama o auto-save
+        autoSalvar(); 
     }
 
     function editarCampo(id, campo) {
@@ -490,7 +586,6 @@
         renderizarGrafico();
     }
 
-    // RETORNO AO GRÁFICO DE LINHAS COM DEGRADÊ
     function renderizarGrafico() {
         let gastosPorMes = new Array(12).fill(0);
         let rendasPorMes = new Array(12).fill(0);
