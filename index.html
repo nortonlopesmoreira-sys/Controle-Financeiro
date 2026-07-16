@@ -120,7 +120,7 @@
 <!-- OVERLAY DE LOGIN -->
 <div id="login-overlay" class="login-overlay">
     <div class="login-box">
-        <h2>🔒 Acesso</h2>
+        <h2>🔒 Acesso da Família</h2>
         <input type="text" id="inp-user" placeholder="Usuário">
         <input type="password" id="inp-pass" placeholder="Senha">
         <button id="btn-login" onclick="fazerLogin()">Entrar no Sistema</button>
@@ -134,19 +134,30 @@
         
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <h1>Controle Financeiro Familiar</h1>
-            <!-- Novo botão de salvar no banco de dados -->
             <button class="btn-save" onclick="salvarNoBanco()" style="margin-bottom: 20px;" id="btn-salvar-nuvem">💾 Salvar Alterações na Nuvem</button>
         </div>
 
+        <!-- MUDANÇA 1: Título da Receita dinâmico e Filtro de mês movido para o topo para controlar tudo -->
+        <div class="card" style="background: #f8fafc; border-left: 4px solid var(--secondary);">
+            <div class="header-tabela" style="margin-bottom: 0;">
+                <h2 style="margin: 0;">📅 Mês de Referência</h2>
+                <div class="filtro-mes" style="background: white;">
+                    <label for="filtro-mes-view">Selecionar Mês:</label>
+                    <!-- MUDANÇA 2: onchange agora chama mudarMesCorrente() -->
+                    <select id="filtro-mes-view" onchange="mudarMesCorrente()"></select>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
-            <h2>💰 Entrada de Rendas (Mensal)</h2>
+            <h2>💰 Entrada de Rendas - <span id="label-mes-renda" style="color: var(--secondary);">Mês</span></h2>
             <div class="grid grid-4">
                 <div class="form-group">
                     <label>Minha Renda</label>
                     <input type="number" id="renda-minha" value="0" oninput="atualizarDashboard()">
                 </div>
                 <div class="form-group">
-                    <label>Renda Conjuge</label>
+                    <label>Renda Esposa</label>
                     <input type="number" id="renda-esposa" value="0" oninput="atualizarDashboard()">
                 </div>
                 <div class="form-group">
@@ -154,11 +165,11 @@
                     <input type="number" id="extra-meu" value="0" oninput="atualizarDashboard()">
                 </div>
                 <div class="form-group">
-                    <label>Extras Conjuge</label>
+                    <label>Extras Esposa</label>
                     <input type="number" id="extra-esposa" value="0" oninput="atualizarDashboard()">
                 </div>
             </div>
-            <h3 style="text-align: right; color: var(--success); margin-top: 20px; font-weight: 800;">Renda Total: <span id="renda-total-display">R$ 0,00</span></h3>
+            <h3 style="text-align: right; color: var(--success); margin-top: 20px; font-weight: 800;">Renda Total do Mês: <span id="renda-total-display">R$ 0,00</span></h3>
         </div>
 
         <div class="card">
@@ -204,13 +215,7 @@
         <div class="card">
             <div class="header-tabela">
                 <h2>📋 Extrato de Contas</h2>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <div class="filtro-mes">
-                        <label for="filtro-mes-view">📅 Mês:</label>
-                        <select id="filtro-mes-view" onchange="atualizarDashboard()"></select>
-                    </div>
-                    <button class="btn-save" onclick="imprimirRelatorio()" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: none; padding: 8px 16px;">🖨️ Imprimir</button>
-                </div>
+                <button class="btn-save" onclick="imprimirRelatorio()" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); box-shadow: none; padding: 8px 16px;">🖨️ Imprimir</button>
             </div>
             
             <div class="resumo-cards">
@@ -256,7 +261,7 @@
 </div>
 
 <div id="area-impressao">
-    <!-- Estrutura de impressão original mantida -->
+    <!-- Estrutura de impressão -->
     <h1 style="text-align: center; color: var(--primary); margin-bottom: 5px;">Relatório Financeiro</h1>
     <h3 style="text-align: center; color: #718096; margin-top: 0;">Mês de Referência: <span id="print-mes"></span></h3>
     
@@ -304,17 +309,22 @@
 </div>
 
 <script>
-    // ========= CONFIGURAÇÃO DO BANCO DE DADOS (GOOGLE SHEETS) =========
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoY0m8VV6wZaGeeNPfXJQKW9jMrRGWLv3JmW4uDJKPtHvXaXItCiH0KXpUXkZMqR62/exec'; // <--- COLOQUE SUA URL AQUI
+    // URL DO SEU APPS SCRIPT
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoY0m8VV6wZaGeeNPfXJQKW9jMrRGWLv3JmW4uDJKPtHvXaXItCiH0KXpUXkZMqR62/exec'; 
     
-    // Variáveis Globais de Sessão
     let sessionUser = "";
     let sessionPass = "";
 
+    // MUDANÇA 3: Inicializando rendas como um objeto vazio, preencheremos de 0 a 11
     let appData = {
-        rendas: { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 },
+        rendas: {}, 
         contas: [] 
     };
+
+    // Estrutura inicial padrão para cada mês
+    for(let i=0; i<12; i++) {
+        appData.rendas[i] = { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 };
+    }
 
     const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const mesesCurtos = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -334,17 +344,32 @@
         document.getElementById('mes-base').value = mesAtual;
     });
 
-    // ========= LÓGICA DE LOGIN E BANCO DE DADOS =========
+    // Função Nova: Lida com a troca do mês no select principal
+    function mudarMesCorrente() {
+        const mesSelecionado = parseInt(document.getElementById('filtro-mes-view').value);
+        document.getElementById('label-mes-renda').innerText = meses[mesSelecionado];
+        
+        // Garantir que a estrutura do mês existe
+        if (!appData.rendas[mesSelecionado]) {
+            appData.rendas[mesSelecionado] = { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 };
+        }
+
+        // Carrega os valores correspondentes daquele mês nos campos de input
+        document.getElementById('renda-minha').value = appData.rendas[mesSelecionado].minha || 0;
+        document.getElementById('renda-esposa').value = appData.rendas[mesSelecionado].esposa || 0;
+        document.getElementById('extra-meu').value = appData.rendas[mesSelecionado].extraMeu || 0;
+        document.getElementById('extra-esposa').value = appData.rendas[mesSelecionado].extraEsposa || 0;
+
+        atualizarDashboard();
+    }
+
     async function fazerLogin() {
         const user = document.getElementById('inp-user').value;
         const pass = document.getElementById('inp-pass').value;
         const msg = document.getElementById('msg-login');
         const btn = document.getElementById('btn-login');
 
-        if(!user || !pass) {
-            msg.innerText = "Preencha usuário e senha!";
-            return;
-        }
+        if(!user || !pass) { msg.innerText = "Preencha usuário e senha!"; return; }
 
         btn.innerText = "Autenticando...";
         msg.innerText = "";
@@ -361,28 +386,33 @@
                 sessionUser = user;
                 sessionPass = pass;
                 
-                // Se a família já tiver dados salvos, nós carregamos
                 if(result.data) {
-                    appData = JSON.parse(result.data);
+                    let loadedData = JSON.parse(result.data);
                     
-                    // Tratamento preventivo para arrays faltantes
+                    // Migração de Segurança: Se os dados vierem do modelo antigo (renda única),
+                    // copiamos a renda única para todos os 12 meses para não perder os dados do usuário.
+                    if (loadedData.rendas && loadedData.rendas.minha !== undefined) {
+                        let rendaAntiga = { ...loadedData.rendas };
+                        loadedData.rendas = {};
+                        for(let i=0; i<12; i++) {
+                            loadedData.rendas[i] = { ...rendaAntiga };
+                        }
+                    }
+
+                    appData = loadedData;
+                    
                     if(!appData.contas) appData.contas = [];
                     appData.contas.forEach(c => { 
                         if(!c.pagas) c.pagas = []; 
                         if(!c.excecoes) c.excecoes = {}; 
                     });
-
-                    // Preencher os inputs visuais de renda
-                    document.getElementById('renda-minha').value = appData.rendas.minha || 0;
-                    document.getElementById('renda-esposa').value = appData.rendas.esposa || 0;
-                    document.getElementById('extra-meu').value = appData.rendas.extraMeu || 0;
-                    document.getElementById('extra-esposa').value = appData.rendas.extraEsposa || 0;
                 }
 
-                // Libera a interface
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('app-wrapper').classList.remove('is-blurred');
-                atualizarDashboard();
+                
+                // Força o carregamento do mês atual ao logar
+                mudarMesCorrente();
 
             } else {
                 msg.innerText = result.message || "Credenciais inválidas.";
@@ -398,8 +428,7 @@
     async function salvarNoBanco() {
         const btn = document.getElementById('btn-salvar-nuvem');
         btn.innerText = "⏳ Salvando...";
-        
-        capturarRendas();
+        capturarRendas(); // Garante que a última digitação de renda foi pra memória
 
         try {
             const response = await fetch(SCRIPT_URL, {
@@ -421,13 +450,20 @@
         }
     }
 
-    // ========= LÓGICA EXISTENTE DO APP (MANTIDA) =========
+    // MUDANÇA 4: Agora capturar rendas salva no mês específico
     function capturarRendas() {
-        appData.rendas.minha = parseFloat(document.getElementById('renda-minha').value) || 0;
-        appData.rendas.esposa = parseFloat(document.getElementById('renda-esposa').value) || 0;
-        appData.rendas.extraMeu = parseFloat(document.getElementById('extra-meu').value) || 0;
-        appData.rendas.extraEsposa = parseFloat(document.getElementById('extra-esposa').value) || 0;
-        let total = appData.rendas.minha + appData.rendas.esposa + appData.rendas.extraMeu + appData.rendas.extraEsposa;
+        const mesSelecionado = parseInt(document.getElementById('filtro-mes-view').value);
+        
+        if (!appData.rendas[mesSelecionado]) {
+            appData.rendas[mesSelecionado] = { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 };
+        }
+        
+        appData.rendas[mesSelecionado].minha = parseFloat(document.getElementById('renda-minha').value) || 0;
+        appData.rendas[mesSelecionado].esposa = parseFloat(document.getElementById('renda-esposa').value) || 0;
+        appData.rendas[mesSelecionado].extraMeu = parseFloat(document.getElementById('extra-meu').value) || 0;
+        appData.rendas[mesSelecionado].extraEsposa = parseFloat(document.getElementById('extra-esposa').value) || 0;
+        
+        let total = appData.rendas[mesSelecionado].minha + appData.rendas[mesSelecionado].esposa + appData.rendas[mesSelecionado].extraMeu + appData.rendas[mesSelecionado].extraEsposa;
         document.getElementById('renda-total-display').innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         return total;
     }
@@ -440,10 +476,7 @@
         let parcelaAtual = parseInt(document.getElementById('parcela-atual').value) || 1;
         let totalParcelas = parseInt(document.getElementById('total-parcelas').value) || 1;
 
-        if (!desc || isNaN(valor) || isNaN(venc)) {
-            alert("Preencha a descrição, valor e vencimento corretamente!");
-            return;
-        }
+        if (!desc || isNaN(valor) || isNaN(venc)) { alert("Preencha a descrição, valor e vencimento corretamente!"); return; }
 
         appData.contas.push({ id: Date.now(), desc, valor, venc, mesBase, parcelaAtual, totalParcelas, pagas: [], excecoes: {} });
         
@@ -471,7 +504,6 @@
         let conta = appData.contas.find(c => c.id === id);
         if (!conta.excecoes) conta.excecoes = {};
         if (!conta.excecoes[mesIndex]) conta.excecoes[mesIndex] = {};
-
         let valorAtual = conta.excecoes[mesIndex][campo] !== undefined ? conta.excecoes[mesIndex][campo] : conta[campo];
 
         if (campo === 'desc') {
@@ -488,9 +520,9 @@
     }
 
     function atualizarDashboard() {
-        let rendaTotal = capturarRendas();
-        atualizarTabela(rendaTotal);
-        renderizarGrafico(rendaTotal);
+        let rendaTotalMesAtual = capturarRendas();
+        atualizarTabela(rendaTotalMesAtual);
+        renderizarGrafico(); // O gráfico agora calcula tudo sozinho
     }
 
     function atualizarTabela(rendaTotal) {
@@ -556,8 +588,19 @@
         `;
     }
 
-    function renderizarGrafico(rendaTotal) {
+    // MUDANÇA 5: O gráfico agora varre as rendas de cada mês para o cálculo exato
+    function renderizarGrafico() {
         let gastosPorMes = new Array(12).fill(0);
+        let rendasPorMes = new Array(12).fill(0);
+
+        // Somar Rendas de Cada Mês
+        for(let m = 0; m < 12; m++) {
+            if(appData.rendas[m]) {
+                rendasPorMes[m] = (appData.rendas[m].minha || 0) + (appData.rendas[m].esposa || 0) + (appData.rendas[m].extraMeu || 0) + (appData.rendas[m].extraEsposa || 0);
+            }
+        }
+
+        // Somar Contas de Cada Mês
         appData.contas.forEach(c => {
             for(let m = 0; m < 12; m++) {
                 let diff = m - c.mesBase;
@@ -568,7 +611,8 @@
                 }
             }
         });
-        let sobraPorMes = gastosPorMes.map(gasto => rendaTotal - gasto);
+        
+        let sobraPorMes = gastosPorMes.map((gasto, index) => rendasPorMes[index] - gasto);
 
         const ctx = document.getElementById('graficoSobra').getContext('2d');
         if (meuGrafico) meuGrafico.destroy(); 
