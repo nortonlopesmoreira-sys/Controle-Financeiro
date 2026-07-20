@@ -28,7 +28,29 @@
         }
         .login-box h2 { display: block; text-align: center; margin-bottom: 25px; }
         .login-box input { width: 100%; margin-bottom: 15px; }
-        .login-box button { width: 100%; background: linear-gradient(135deg, #00b4d8, #0077b6); font-size: 1.1em; padding: 14px; }
+        
+        /* Novo Container para a Senha */
+        .password-container { position: relative; width: 100%; margin-bottom: 15px; }
+        .password-container input { width: 100%; margin-bottom: 0; padding-right: 45px; } /* Espaço para o ícone não encostar no texto */
+
+        .toggle-password { 
+            position: absolute; 
+            right: 12px; 
+            top: 50%; /* Centraliza perfeitamente na vertical */
+            transform: translateY(-50%);
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: #718096; /* Cor cinza do ícone */
+            transition: color 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: var(--secondary); /* Fica azulzinho ao passar o mouse */
+        }
+
+        .login-box button { width: 100%; background: linear-gradient(135deg, #00b4d8, #0077b6); font-size: 1.1em; padding: 14px; margin-top: 5px; }
         
         #app-wrapper { padding: 20px; transition: filter 0.3s ease; }
         .is-blurred { filter: blur(10px); pointer-events: none; user-select: none; overflow: hidden; height: 100vh;}
@@ -104,7 +126,7 @@
         @media print {
             .login-overlay, #modal-recuperacao { display: none !important; }
             #app-wrapper { filter: none !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
-            button:not(.btn-status) { display: none !important; } /* Esconde todos os botões, exceto o de status */
+            button:not(.btn-status) { display: none !important; } 
             .user-panel, #status-salvamento { display: none !important; }
             input, select { border: none !important; background: transparent !important; padding: 0 !important; color: black !important; font-weight: bold; -webkit-appearance: none; appearance: none; }
             body { background: white !important; color: black !important; }
@@ -120,7 +142,20 @@
     <div class="login-box">
         <h2>🔒 Acesso da Família</h2>
         <input type="text" id="inp-user" placeholder="Usuário">
-        <input type="password" id="inp-pass" placeholder="Senha">
+        
+        <!-- Input de senha modificado com o olhinho -->
+        <!-- Input de senha modificado com ícone SVG profissional -->
+        <div class="password-container">
+            <input type="password" id="inp-pass" placeholder="Senha">
+            <span class="toggle-password" onclick="alternarSenha()" id="icone-senha" title="Mostrar/Ocultar senha">
+                <!-- Desenho do olho aberto (SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </span>
+        </div>
+
         <button id="btn-login" onclick="fazerLogin()">Entrar no Sistema</button>
         <p id="msg-login" style="color: var(--danger); font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
         <p style="margin-top: 20px; font-size: 0.85em; cursor: pointer; color: var(--secondary); text-decoration: underline;" onclick="abrirModalRecuperacao()">Esqueci minha senha</p>
@@ -241,7 +276,7 @@
 
 <script>
     // URL DO SEU APPS SCRIPT AQUI ==========================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxoY0m8VV6wZaGeeNPfXJQKW9jMrRGWLv3JmW4uDJKPtHvXaXItCiH0KXpUXkZMqR62/exec'; 
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxVE7_kwzn6ehSlUe943czGKa8B2QTh9ECjUH8J_WFeYMZOaGZzOhV0V2Vo_HXjdg/exec'; 
     // ======================================================
     
     let sessionUser = "", sessionPass = "";
@@ -272,6 +307,24 @@
         });
     });
 
+    // Ícones em formato SVG guardados em texto
+    const iconeOlhoAberto = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    const iconeOlhoFechado = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+
+    // FUNÇÃO PARA MOSTRAR/ESCONDER SENHA
+    function alternarSenha() {
+        const inputSenha = document.getElementById('inp-pass');
+        const iconeContainer = document.getElementById('icone-senha');
+        
+        if (inputSenha.type === 'password') {
+            inputSenha.type = 'text'; // Mostra a senha
+            iconeContainer.innerHTML = iconeOlhoFechado; // Troca para o olho com o risco
+        } else {
+            inputSenha.type = 'password'; // Oculta a senha
+            iconeContainer.innerHTML = iconeOlhoAberto; // Troca para o olho normal
+        }
+    }
+
     // SISTEMA DE RECUPERAÇÃO DE SENHA
     function abrirModalRecuperacao() {
         document.getElementById('login-overlay').style.display = 'none';
@@ -299,7 +352,6 @@
         btn.innerText = "Enviando...";
         
         try {
-            // Envia requisição para o Apps Script
             const response = await fetch(SCRIPT_URL, { 
                 method: 'POST', 
                 body: JSON.stringify({ action: 'recover', email: email, cpf: cpf }) 
@@ -322,7 +374,12 @@
             sessionUser = ""; 
             sessionPass = "";
             appData = { rendas: {}, contas: [] };
-            document.getElementById('inp-pass').value = ""; // Limpa a senha
+            
+            // Restaura o campo de senha para password ao sair
+            document.getElementById('inp-pass').type = "password"; 
+            document.querySelector('.toggle-password').innerText = "👁️";
+            
+            document.getElementById('inp-pass').value = ""; 
             
             document.getElementById('user-info').style.display = 'none';
             document.getElementById('status-salvamento').style.display = 'none';
@@ -399,7 +456,8 @@
     }
 
     async function fazerLogin() {
-        const user = document.getElementById('inp-user').value;
+        // Implementado: toLowerCase() e trim() para tornar o login Case-Insensitive
+        const user = document.getElementById('inp-user').value.trim().toLowerCase();
         const pass = document.getElementById('inp-pass').value;
         const msg = document.getElementById('msg-login');
         const btn = document.getElementById('btn-login');
