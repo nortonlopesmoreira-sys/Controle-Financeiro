@@ -133,6 +133,38 @@
             .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin-bottom: 15px; }
             .chart-container { break-inside: avoid; }
         }
+        /* ======== TELA DE PLANOS ======== */
+        .planos-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(43, 58, 74, 0.85); display: none; align-items: center; justify-content: center;
+            z-index: 10000; backdrop-filter: blur(5px); overflow-y: auto; padding: 20px;
+        }
+        .planos-container {
+            background: var(--bg); padding: 30px; border-radius: var(--radius-card);
+            width: 100%; max-width: 900px; text-align: center; position: relative;
+        }
+        .planos-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;
+        }
+        .plano-card {
+            background: white; padding: 25px; border-radius: 12px; border: 2px solid #e2e8f0;
+            transition: transform 0.3s, border-color 0.3s; display: flex; flex-direction: column;
+        }
+        .plano-card:hover { transform: translateY(-5px); border-color: var(--secondary); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .plano-card.destaque { border-color: var(--success); position: relative; transform: scale(1.03); }
+        .plano-card.destaque::before {
+            content: 'Mais Popular'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold;
+        }
+        .plano-preco { font-size: 2em; font-weight: 800; color: var(--primary); margin: 15px 0; }
+        .plano-mes { font-size: 0.4em; color: #718096; font-weight: normal; }
+        .btn-assinar { background: var(--primary); margin-top: auto; padding: 12px; width: 100%; }
+        .plano-card.destaque .btn-assinar { background: var(--success); }
+        .btn-fechar-planos {
+            position: absolute; top: 15px; right: 15px; background: transparent; color: var(--danger);
+            border: none; font-size: 1.5em; cursor: pointer; padding: 0; box-shadow: none;
+        }
+        .btn-fechar-planos:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -175,6 +207,46 @@
     </div>
 </div>
 
+<!-- TELA DE ASSINATURA -->
+<div id="planos-overlay" class="planos-overlay">
+    <div class="planos-container">
+        <button class="btn-fechar-planos" onclick="fecharPlanos()">✖</button>
+        <h2>🚀 Escolha seu Plano</h2>
+        <p style="color: #718096;">O seu mês de teste grátis será ativado automaticamente na primeira assinatura.</p>
+        
+        <div class="planos-grid">
+            <div class="plano-card">
+                <h3>Mensal</h3>
+                <div class="plano-preco">R$ 9,99<span class="plano-mes">/mês</span></div>
+                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">Acesso completo com renovação a cada mês.</p>
+                <button class="btn-assinar" onclick="iniciarAssinatura('mensal')">Assinar Mensal</button>
+            </div>
+            
+            <div class="plano-card">
+                <h3>Trimestral</h3>
+                <div class="plano-preco">R$ 26,90<span class="plano-mes">/trimestre</span></div>
+                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">~ R$ 8,96/mês. Economize 10%.</p>
+                <button class="btn-assinar" onclick="iniciarAssinatura('trimestral')">Assinar Trimestral</button>
+            </div>
+
+            <div class="plano-card destaque">
+                <h3>Anual</h3>
+                <div class="plano-preco">R$ 89,90<span class="plano-mes">/ano</span></div>
+                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">~ R$ 7,49/mês. Nosso plano com melhor custo-benefício (25% off).</p>
+                <button class="btn-assinar" onclick="iniciarAssinatura('anual')">Assinar Anual</button>
+            </div>
+
+            <div class="plano-card">
+                <h3>Vitalício</h3>
+                <div class="plano-preco">R$ 199,90<span class="plano-mes"> único</span></div>
+                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">Pague apenas uma vez e tenha acesso para sempre.</p>
+                <button class="btn-assinar" onclick="iniciarAssinatura('vitalicio')">Comprar Acesso</button>
+            </div>
+        </div>
+        <!-- Pulei o semestral no HTML para não poluir muito a tela, mas você pode adicioná-lo copiando um bloco acima se desejar -->
+    </div>
+</div>
+
 <div id="app-wrapper" class="is-blurred">
     <div class="container">
         
@@ -185,6 +257,7 @@
                 <div id="user-info" class="user-panel">
                     <span style="font-size: 1.2em;">👤</span>
                     <span id="display-username" style="font-weight: 800; color: var(--primary);">Usuário</span>
+                    <button class="btn-print" style="background: var(--warning); color: #fff;" onclick="abrirPlanos()">⭐ Premium</button>
                     <button class="btn-logout" onclick="fazerLogout()">Sair</button>
                 </div>
                 <div id="status-salvamento">✔️ Sincronizado</div>
@@ -455,6 +528,7 @@
         atualizarDashboard();
     }
 
+
     async function fazerLogin() {
         // Implementado: toLowerCase() e trim() para tornar o login Case-Insensitive
         const user = document.getElementById('inp-user').value.trim().toLowerCase();
@@ -704,6 +778,25 @@
                 } 
             }
         });
+    }
+
+    // --- FUNÇÕES DE ASSINATURA ---
+    function abrirPlanos() {
+        document.getElementById('planos-overlay').style.display = 'flex';
+    }
+
+    function fecharPlanos() {
+        document.getElementById('planos-overlay').style.display = 'none';
+    }
+
+    function iniciarAssinatura(planoEscolhido) {
+        // Verifica se a ponte "AndroidApp" existe (ou seja, se está dentro do seu app)
+        if (typeof AndroidApp !== "undefined") {
+            // Chama a função Java passando o nome do plano
+            AndroidApp.abrirTelaDePagamento(planoEscolhido);
+        } else {
+            alert("Atenção: A compra de assinaturas deve ser feita através do nosso Aplicativo Oficial no Android.");
+        }
     }
 </script>
 </body>
