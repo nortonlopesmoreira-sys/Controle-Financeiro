@@ -10,10 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" crossorigin="anonymous"></script>
     <style>
         :root {
-            --bg: #f0f4f8; --primary: #2b3a4a; --secondary: #00b4d8;
-            --success: #2ec4b6; --danger: #ff3366; --warning: #ffb703;
+            --bg: #f4f6f9; --primary: #1f2937; --secondary: #2f6fed;
+            --success: #16a394; --danger: #e0294f; --warning: #d98c0a;
             --card-bg: #ffffff; --text: #2d3748;
-            --radius-btn: 50px; --radius-card: 16px;
+            --radius-btn: 10px; --radius-card: 16px;
         }
         
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -22,15 +22,27 @@
         /* ======== TELAS DE LOGIN / RECUPERAÇÃO ======== */
         .login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(43, 58, 74, 0.4); display: flex; align-items: center; justify-content: center;
-            z-index: 9999; backdrop-filter: blur(8px);
+            background: rgba(31, 41, 55, 0.45); display: flex; align-items: center; justify-content: center;
+            z-index: 9999; backdrop-filter: blur(6px);
         }
         .login-box {
-            background: var(--card-bg); padding: 40px; border-radius: var(--radius-card);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center;
+            background: var(--card-bg); padding: 36px 32px; border-radius: var(--radius-card);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12); width: 90%; max-width: 360px; text-align: center;
         }
-        .login-box h2 { display: block; text-align: center; margin-bottom: 25px; }
+        .login-icon {
+            width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 14px;
+            background: rgba(47, 111, 237, 0.12); display: flex; align-items: center;
+            justify-content: center; font-size: 1.6em;
+        }
+        .login-sub { font-size: 0.85em; color: #718096; margin: -12px 0 24px; }
+        .login-box h2 { display: block; text-align: center; margin-bottom: 6px; }
         .login-box input { width: 100%; margin-bottom: 15px; }
+        .login-link { margin-top: 22px; font-size: 0.85em; cursor: pointer; color: var(--secondary); font-weight: 600; }
+        .login-trust {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-top: 22px; padding-top: 14px; border-top: 1px solid #edf2f7;
+            font-size: 0.75em; color: #a0aec0;
+        }
         
         /* Novo Container para a Senha */
         .password-container { position: relative; width: 100%; margin-bottom: 15px; }
@@ -53,7 +65,7 @@
             color: var(--secondary); /* Fica azulzinho ao passar o mouse */
         }
 
-        .login-box button { width: 100%; background: linear-gradient(135deg, #00b4d8, #0077b6); font-size: 1.1em; padding: 14px; margin-top: 5px; }
+        .login-box button { width: 100%; background: var(--secondary); font-size: 1em; padding: 13px; margin-top: 5px; }
         
         #app-wrapper { padding: 20px; transition: filter 0.3s ease; }
         .is-blurred { filter: blur(10px); pointer-events: none; user-select: none; overflow: hidden; height: 100vh;}
@@ -74,47 +86,60 @@
             border: 1px solid #e2e8f0; transition: all 0.3s ease; display: none;
         }
 
-        .card { background: var(--card-bg); padding: 25px; border-radius: var(--radius-card); box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid rgba(0,0,0,0.02); }
+        .card { background: var(--card-bg); padding: 25px; border-radius: var(--radius-card); box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #edf2f7; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
         
         .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
         label { font-size: 0.85em; font-weight: 700; margin-bottom: 8px; color: #718096; text-transform: uppercase; }
-        input, select { padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95em; background: #f8fafc; transition: all 0.3s; }
-        input:focus, select:focus { border-color: var(--secondary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15); }
+        input, select { padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95em; background: #f8fafc; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--secondary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15); }
         
-        button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border: none; border-radius: var(--radius-btn); cursor: pointer; font-weight: 700; color: white; font-size: 0.95em; transition: all 0.3s ease; }
-        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-        button:active { transform: translateY(0); }
+        button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border: none; border-radius: var(--radius-btn); cursor: pointer; font-weight: 600; color: white; font-size: 0.95em; transition: all 0.15s ease; }
+        button:hover { filter: brightness(1.05); }
+        button:active { transform: scale(0.98); }
         
-        .btn-add { background: linear-gradient(135deg, #ff9f1c, #ff6b6b); width: 100%; margin-top: 15px; padding: 14px; }
-        .btn-delete { background: var(--danger); padding: 6px 12px; font-size: 0.85em; border-radius: 8px; box-shadow: none; }
-        .btn-print { background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 6px 12px; box-shadow: none; }
-        .btn-logout { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 6px 12px; font-size: 0.85em; box-shadow: none; }
+        .btn-add { background: var(--secondary); width: 100%; margin-top: 15px; padding: 14px; }
+        .btn-delete { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 6px 12px; font-size: 0.85em; border-radius: 8px; }
+        .btn-delete:hover { background: var(--danger); color: white; }
+        .btn-print { background: #6b7280; padding: 6px 12px; }
+        .btn-logout { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 6px 12px; font-size: 0.85em; }
         .btn-logout:hover { background: var(--danger); color: white; }
         
-        .btn-status { padding: 6px 14px; font-size: 0.85em; border-radius: 20px; box-shadow: none; }
-        .status-pago { background-color: rgba(46, 196, 182, 0.15); color: #11998e; border: 1px solid #2ec4b6; }
-        .status-pendente { background-color: rgba(255, 51, 102, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-status { padding: 6px 14px; font-size: 0.85em; border-radius: 20px; }
+        .status-pago { background-color: rgba(22, 163, 148, 0.12); color: var(--success); border: 1px solid var(--success); }
+        .status-pendente { background-color: rgba(217, 140, 10, 0.12); color: var(--warning); border: 1px solid var(--warning); }
         
-        .resumo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .mini-card { padding: 15px; border-radius: 12px; background: #f8fafc; border-left: 5px solid #cbd5e0; }
-        .mini-card.total { border-left-color: var(--secondary); }
-        .mini-card.pago { border-left-color: var(--success); }
-        .mini-card.restante { border-left-color: var(--danger); }
+        .resumo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .mini-card { padding: 15px; border-radius: 12px; background: #f8fafc; }
+        .mini-card.restante { background: rgba(224, 41, 79, 0.06); }
         .mini-card p { margin: 0; font-size: 0.8em; color: #718096; font-weight: bold; text-transform: uppercase; }
-        .mini-card h4 { margin: 5px 0 0 0; font-size: 1.2em; color: var(--primary); }
+        .mini-card h4 { margin: 5px 0 0 0; font-size: 1.25em; color: var(--primary); font-weight: 600; }
 
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: 10px; }
-        th { text-align: left; padding: 12px 16px; color: #718096; font-size: 0.85em; text-transform: uppercase; }
-        td { padding: 14px 16px; background: #f8fafc; }
-        tr:hover td { background: #edf2f7; }
-        td:first-child { border-radius: 10px 0 0 10px; }
-        td:last-child { border-radius: 0 10px 10px 0; }
-        .linha-paga td { text-decoration: line-through; color: #a0aec0; opacity: 0.7; }
-        .linha-paga td:last-child, .linha-paga td:nth-child(3) { text-decoration: none; }
+        .lista-contas { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .conta-card { display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1px solid #edf2f7; border-radius: 14px; padding: 13px 16px; transition: background 0.15s; }
+        .conta-card:hover { background: #eef2f7; }
+        .conta-card.paga { opacity: 0.65; }
+        .conta-icone { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1em; }
+        .conta-icone.pago { background: rgba(22, 163, 148, 0.14); }
+        .conta-icone.pendente { background: rgba(217, 140, 10, 0.14); }
+        .conta-icone.vencido { background: rgba(224, 41, 79, 0.14); }
+        .conta-info { flex: 1; min-width: 0; }
+        .conta-desc { font-weight: 600; font-size: 0.95em; margin: 0; cursor: pointer; }
+        .conta-desc.paga { text-decoration: line-through; color: #a0aec0; }
+        .conta-sub { font-size: 0.8em; color: #718096; margin: 3px 0 0; }
+        .conta-valor-wrap { text-align: right; }
+        .conta-valor { font-weight: 600; font-size: 0.95em; margin: 0; cursor: pointer; }
+        .conta-valor.paga { text-decoration: line-through; color: #a0aec0; }
+        .conta-badge { font-size: 0.72em; font-weight: 700; padding: 2px 10px; border-radius: 20px; display: inline-block; margin-top: 4px; cursor: pointer; border: none; }
+        .conta-badge.pago { background: rgba(22, 163, 148, 0.14); color: var(--success); }
+        .conta-badge.pendente { background: rgba(217, 140, 10, 0.14); color: var(--warning); }
+        .conta-badge.vencido { background: rgba(224, 41, 79, 0.14); color: var(--danger); }
+        .conta-acoes { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .conta-excluir { background: transparent; color: #cbd5e0; border: none; padding: 6px; font-size: 1em; box-shadow: none; }
+        .conta-excluir:hover { color: var(--danger); background: transparent; filter: none; }
         
-        .badge { background: #e2e8f0; padding: 4px 10px; border-radius: 30px; font-size: 0.8em; font-weight: 700; color: #4a5568; }
+        .badge { background: #e2e8f0; padding: 4px 10px; border-radius: 30px; font-size: 0.75em; font-weight: 700; color: #4a5568; white-space: nowrap; }
         .chart-container { position: relative; height: 35vh; width: 100%; }
         
         .header-tabela { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
@@ -127,7 +152,7 @@
 
         /* ======== CONFIGURAÇÕES DE IMPRESSÃO ======== */
         @media print {
-            .login-overlay, #modal-recuperacao { display: none !important; }
+            .login-overlay, #modal-recuperacao, #modal-redefinir { display: none !important; }
             #app-wrapper { filter: none !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
             button:not(.btn-status) { display: none !important; } 
             .user-panel, #status-salvamento { display: none !important; }
@@ -175,13 +200,15 @@
 <!-- TELA DE LOGIN -->
 <div id="login-overlay" class="login-overlay">
     <div class="login-box">
-        <h2>🔒 Acesso da Família</h2>
-        <input type="text" id="inp-user" placeholder="Usuário">
+        <div class="login-icon">💰</div>
+        <h2>Bem-vindo de volta</h2>
+        <p class="login-sub">Entre para ver as contas da família</p>
+        <input type="text" id="inp-user" placeholder="Usuário" onkeydown="if(event.key==='Enter') document.getElementById('inp-pass').focus();">
         
         <!-- Input de senha modificado com o olhinho -->
         <!-- Input de senha modificado com ícone SVG profissional -->
         <div class="password-container">
-            <input type="password" id="inp-pass" placeholder="Senha">
+            <input type="password" id="inp-pass" placeholder="Senha" onkeydown="if(event.key==='Enter') fazerLogin();">
             <span class="toggle-password" onclick="alternarSenha()" id="icone-senha" title="Mostrar/Ocultar senha">
                 <!-- Desenho do olho aberto (SVG) -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -191,9 +218,10 @@
             </span>
         </div>
 
-        <button id="btn-login" onclick="fazerLogin()">Entrar no Sistema</button>
+        <button id="btn-login" onclick="fazerLogin()">Entrar no sistema</button>
         <p id="msg-login" style="color: var(--danger); font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
-        <p style="margin-top: 20px; font-size: 0.85em; cursor: pointer; color: var(--secondary); text-decoration: underline;" onclick="abrirModalRecuperacao()">Esqueci minha senha</p>
+        <p class="login-link" onclick="abrirModalRecuperacao()">Esqueci minha senha</p>
+        <div class="login-trust">🔒 Conexão segura</div>
     </div>
 </div>
 
@@ -202,11 +230,24 @@
     <div class="login-box">
         <h2>Recuperar Senha</h2>
         <p style="font-size: 0.9em; color: #718096; margin-bottom: 20px;">Digite seus dados para receber as instruções.</p>
-        <input type="email" id="rec-email" placeholder="Seu E-mail">
-        <input type="text" id="rec-cpf" placeholder="Seu CPF (Somente números)">
+        <input type="email" id="rec-email" placeholder="Seu E-mail" onkeydown="if(event.key==='Enter') solicitarRecuperacao();">
+        <input type="text" id="rec-cpf" placeholder="Seu CPF (Somente números)" onkeydown="if(event.key==='Enter') solicitarRecuperacao();">
         <button onclick="solicitarRecuperacao()" id="btn-recuperar">Enviar Solicitação</button>
         <button onclick="fecharModalRecuperacao()" style="background: transparent; color: #718096; margin-top: 10px; box-shadow: none; border: 1px solid #e2e8f0;">Voltar ao Login</button>
         <p id="msg-rec" style="font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+</div>
+
+<!-- TELA DE REDEFINIÇÃO DE SENHA (passo 2, após receber o código por e-mail) -->
+<div id="modal-redefinir" class="login-overlay" style="display: none;">
+    <div class="login-box">
+        <h2>Digite o Código</h2>
+        <p style="font-size: 0.9em; color: #718096; margin-bottom: 20px;">Enviamos um código de 6 dígitos para o seu e-mail. Ele vale por 15 minutos.</p>
+        <input type="text" id="reset-codigo" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric" onkeydown="if(event.key==='Enter') document.getElementById('reset-nova-senha').focus();">
+        <input type="password" id="reset-nova-senha" placeholder="Nova senha (mín. 6 caracteres)" maxlength="60" onkeydown="if(event.key==='Enter') confirmarRedefinicao();">
+        <button onclick="confirmarRedefinicao()" id="btn-redefinir">Confirmar Nova Senha</button>
+        <button onclick="fecharModalRedefinir()" style="background: transparent; color: #718096; margin-top: 10px; box-shadow: none; border: 1px solid #e2e8f0;">Voltar ao Login</button>
+        <p id="msg-redefinir" style="font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
     </div>
 </div>
 
@@ -330,15 +371,12 @@
             
             <div class="resumo-cards">
                 <div class="mini-card total"><p>Total do Mês</p><h4 id="resumo-total">R$ 0,00</h4></div>
-                <div class="mini-card pago"><p>Já Pago</p><h4 id="resumo-pago" style="color: #11998e;">R$ 0,00</h4></div>
+                <div class="mini-card pago"><p>Já Pago</p><h4 id="resumo-pago" style="color: var(--success);">R$ 0,00</h4></div>
                 <div class="mini-card restante"><p>Restante a Pagar</p><h4 id="resumo-restante" style="color: var(--danger);">R$ 0,00</h4></div>
             </div>
             
             <div style="overflow-x:auto;">
-                <table>
-                    <thead><tr><th>Venc.</th><th>Descrição</th><th>Parcela</th><th>Valor</th><th>Status</th><th style="text-align: center;">Ação</th></tr></thead>
-                    <tbody id="tabela-contas"></tbody>
-                </table>
+                <div id="tabela-contas" class="lista-contas"></div>
                 <div id="rodape-saldo-parcial" class="rodape-info"></div>
             </div>
         </div>
@@ -424,9 +462,26 @@
         document.getElementById('login-overlay').style.display = 'flex';
     }
 
+    // Guarda email/cpf da solicitação para reusar na etapa de confirmação do código
+    let recEmailAtual = '';
+    let recCpfAtual = '';
+
+    function abrirModalRedefinir() {
+        document.getElementById('modal-recuperacao').style.display = 'none';
+        document.getElementById('modal-redefinir').style.display = 'flex';
+        document.getElementById('msg-redefinir').innerText = '';
+        document.getElementById('reset-codigo').value = '';
+        document.getElementById('reset-nova-senha').value = '';
+    }
+
+    function fecharModalRedefinir() {
+        document.getElementById('modal-redefinir').style.display = 'none';
+        document.getElementById('login-overlay').style.display = 'flex';
+    }
+
     async function solicitarRecuperacao() {
-        const email = document.getElementById('rec-email').value;
-        const cpf = document.getElementById('rec-cpf').value;
+        const email = document.getElementById('rec-email').value.trim();
+        const cpf = document.getElementById('rec-cpf').value.replace(/\D/g, '');
         const msg = document.getElementById('msg-rec');
         const btn = document.getElementById('btn-recuperar');
 
@@ -435,7 +490,13 @@
             msg.innerText = "Preencha E-mail e CPF!"; 
             return; 
         }
+        if(cpf.length !== 11) {
+            msg.style.color = "var(--danger)";
+            msg.innerText = "CPF deve ter 11 números.";
+            return;
+        }
 
+        btn.disabled = true;
         btn.innerText = "Enviando...";
         
         try {
@@ -444,14 +505,72 @@
                 body: JSON.stringify({ action: 'recover', email: email, cpf: cpf }) 
             });
             const result = await response.json();
-            
+
+            recEmailAtual = email;
+            recCpfAtual = cpf;
+
             msg.style.color = "var(--success)";
-            msg.innerText = "Solicitação enviada! Se os dados estiverem corretos, você receberá um e-mail. (Requer configuração no Apps Script)";
+            msg.innerText = result.message || "Solicitação enviada!";
+            setTimeout(abrirModalRedefinir, 1200);
         } catch(error) {
             msg.style.color = "var(--danger)";
             msg.innerText = "Erro ao enviar solicitação. Verifique sua conexão.";
         } finally {
+            btn.disabled = false;
             btn.innerText = "Enviar Solicitação";
+        }
+    }
+
+    async function confirmarRedefinicao() {
+        const codigo = document.getElementById('reset-codigo').value.trim();
+        const novaSenha = document.getElementById('reset-nova-senha').value;
+        const msg = document.getElementById('msg-redefinir');
+        const btn = document.getElementById('btn-redefinir');
+
+        if(!codigo || !novaSenha) {
+            msg.style.color = "var(--danger)";
+            msg.innerText = "Preencha o código e a nova senha.";
+            return;
+        }
+        if(novaSenha.length < 6) {
+            msg.style.color = "var(--danger)";
+            msg.innerText = "A nova senha deve ter pelo menos 6 caracteres.";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Confirmando...";
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'reset',
+                    email: recEmailAtual,
+                    cpf: recCpfAtual,
+                    codigo: codigo,
+                    novaSenha: novaSenha
+                })
+            });
+            const result = await response.json();
+
+            if(result.status === 'success') {
+                msg.style.color = "var(--success)";
+                msg.innerText = result.message;
+                setTimeout(() => {
+                    document.getElementById('modal-redefinir').style.display = 'none';
+                    document.getElementById('login-overlay').style.display = 'flex';
+                }, 1500);
+            } else {
+                msg.style.color = "var(--danger)";
+                msg.innerText = result.message || "Não foi possível redefinir a senha.";
+            }
+        } catch(error) {
+            msg.style.color = "var(--danger)";
+            msg.innerText = "Erro ao confirmar. Verifique sua conexão.";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Confirmar Nova Senha";
         }
     }
 
@@ -551,7 +670,7 @@
         const btn = document.getElementById('btn-login');
 
         if(!user || !pass) { msg.innerText = "Preencha tudo!"; return; }
-        btn.innerText = "Autenticando..."; msg.innerText = "";
+        btn.disabled = true; btn.innerText = "Autenticando..."; msg.innerText = "";
 
         try {
             const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', user, pass }) });
@@ -593,9 +712,15 @@
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('app-wrapper').classList.remove('is-blurred');
                 mudarMesCorrente();
-            } else { msg.innerText = "Credenciais inválidas."; }
+            } else if(result.status === 'expired') {
+                // Trial expirado: mostra a tela de planos em vez de um erro genérico de senha
+                msg.innerText = "";
+                document.getElementById('planos-overlay').style.display = 'flex';
+            } else {
+                msg.innerText = result.message || "Credenciais inválidas.";
+            }
         } catch(error) { msg.innerText = "Erro de conexão."; } 
-        finally { btn.innerText = "Entrar no Sistema"; }
+        finally { btn.disabled = false; btn.innerText = "Entrar no Sistema"; }
     }
 
     function capturarRendas() {
@@ -707,20 +832,38 @@
         document.getElementById('resumo-restante').innerText = restanteAPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         contasExibicao.sort((a, b) => a.venc - b.venc).forEach(c => {
-            let tr = document.createElement('tr');
-            if(c.estaPaga) tr.className = "linha-paga";
-            tr.innerHTML = `
-                <td><strong>Dia ${String(c.venc).padStart(2, '0')}</strong></td>
-                <td style="cursor: pointer;" onclick="editarCampo(${c.id}, 'desc')">${escapeHtml(c.descAtual)} ✏️</td>
-                <td><span class="badge">${c.parcelaCalculada} / ${c.totalParcelas}</span></td>
-                <td style="cursor: pointer;" onclick="editarCampo(${c.id}, 'valor')"><strong>R$ ${c.valorAtual.toFixed(2)}</strong> ✏️</td>
-                <td><button class="btn-status ${c.estaPaga ? 'status-pago' : 'status-pendente'}" onclick="togglePago(${c.id})">${c.estaPaga ? '✓ Pago' : '⏳ Pendente'}</button></td>
-                <td style="text-align: center;"><button class="btn-delete" onclick="removerConta(${c.id})">Excluir</button></td>
+            const hoje = new Date();
+            const indiceHoje = hoje.getFullYear() * 12 + hoje.getMonth();
+            const indiceView = anoAtualSistema * 12 + mesAtualSistema;
+            let status = 'pendente';
+            if (c.estaPaga) {
+                status = 'pago';
+            } else if (indiceView < indiceHoje || (indiceView === indiceHoje && c.venc < hoje.getDate())) {
+                status = 'vencido';
+            }
+            const iconePorStatus = { pago: '✓', pendente: '⏳', vencido: '⚠️' };
+            const textoPorStatus = { pago: 'Pago', pendente: 'Pendente', vencido: 'Vencido' };
+
+            let div = document.createElement('div');
+            div.className = 'conta-card' + (c.estaPaga ? ' paga' : '');
+            div.innerHTML = `
+                <div class="conta-icone ${status}">${iconePorStatus[status]}</div>
+                <div class="conta-info">
+                    <p class="conta-desc${c.estaPaga ? ' paga' : ''}" onclick="editarCampo(${c.id}, 'desc')">${escapeHtml(c.descAtual)} ✏️</p>
+                    <p class="conta-sub">Parcela ${c.parcelaCalculada}/${c.totalParcelas} • Dia ${String(c.venc).padStart(2, '0')}</p>
+                </div>
+                <div class="conta-valor-wrap">
+                    <p class="conta-valor${c.estaPaga ? ' paga' : ''}" onclick="editarCampo(${c.id}, 'valor')">R$ ${c.valorAtual.toFixed(2)} ✏️</p>
+                    <button class="btn-status conta-badge ${status}" onclick="togglePago(${c.id})">${textoPorStatus[status]}</button>
+                </div>
+                <div class="conta-acoes">
+                    <button class="conta-excluir" onclick="removerConta(${c.id})" title="Excluir conta" aria-label="Excluir conta">🗑️</button>
+                </div>
             `;
-            tbody.appendChild(tr);
+            tbody.appendChild(div);
         });
 
-        if(contasExibicao.length === 0) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 30px;">Nenhuma conta projetada.</td></tr>`;
+        if(contasExibicao.length === 0) tbody.innerHTML = `<p style="text-align:center; padding: 30px; color: #718096;">Nenhuma conta projetada.</p>`;
 
         let saldoAtualNoBolso = rendaTotalMesAtual - totalPago;
         let projecaoFinal = saldoAtualNoBolso - restanteAPagar; 
