@@ -145,6 +145,7 @@
         .header-tabela { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
         .filtro-group { display: flex; gap: 10px; align-items: center; }
         .filtro-box { display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 6px 12px; border-radius: 30px; border: 2px solid #e2e8f0; }
+        .filtro-box label { margin-bottom: 0; font-size: 0.8em; text-transform: none; white-space: nowrap; }
         .filtro-box select { border: none; background: transparent; padding: 0; font-weight: bold; color: var(--primary); cursor: pointer; }
         .filtro-box select:focus { box-shadow: none; }
         
@@ -193,6 +194,34 @@
             border: none; font-size: 1.5em; cursor: pointer; padding: 0; box-shadow: none;
         }
         .btn-fechar-planos:hover { transform: scale(1.1); }
+
+        /* ======== AJUSTES PARA CELULAR ======== */
+        @media (max-width: 600px) {
+            /* iOS Safari dá zoom automático ao focar um input com fonte menor que 16px.
+               Forçamos 16px nos campos para isso não acontecer mais. */
+            input, select, button { font-size: 16px; }
+
+            #app-wrapper { padding: 14px; }
+            .container { max-width: 100%; }
+
+            h1 { font-size: 1.3em; }
+            .header-main { gap: 12px; margin-bottom: 20px; }
+
+            .card { padding: 18px; margin-bottom: 16px; }
+            .grid, .grid-4 { gap: 16px; }
+
+            .login-box { padding: 30px 22px; }
+
+            .resumo-cards { gap: 10px; margin-bottom: 16px; }
+            .mini-card { padding: 12px; }
+
+            .lista-contas { gap: 12px; }
+            .conta-card { padding: 12px 14px; gap: 12px; }
+            .conta-sub { margin-top: 4px; }
+
+            .header-tabela { gap: 12px; }
+            .filtro-group { flex-wrap: wrap; }
+        }
     </style>
 </head>
 <body>
