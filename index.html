@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Controle Financeiro Pro</title>
+    <title>Norcloud Financeiro</title>
+    <script>
+        (function () {
+            try { document.documentElement.setAttribute('data-theme', localStorage.getItem('tema') === 'dark' ? 'dark' : 'light'); }
+            catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+        })();
+    </script>
     <!-- Versão fixada (evita que uma atualização automática da CDN quebre ou comprometa o site).
          Para reforçar ainda mais, gere o hash "integrity" desta versão em https://www.srihash.org/
          e adicione integrity="sha384-..." crossorigin="anonymous" nesta tag. -->
@@ -14,7 +20,27 @@
             --success: #16a394; --danger: #e0294f; --warning: #d98c0a;
             --card-bg: #ffffff; --text: #2d3748;
             --radius-btn: 10px; --radius-card: 16px;
+            --surface-2: #f8fafc; --border: #e2e8f0; --border-soft: #edf2f7;
+            --muted: #718096; --muted-2: #a0aec0; --hover: #eef2f7; --trash: #cbd5e0;
+            --panel: #ffffff; --input-focus-bg: #ffffff; --badge-bg: #e2e8f0; --badge-text: #4a5568;
+            --btn-strong: #1f2937;
+            color-scheme: light;
         }
+        /* ======== TEMA ESCURO ======== */
+        :root[data-theme="dark"] {
+            --bg: #0f172a; --primary: #f1f5f9; --secondary: #4f83f1;
+            --success: #2cc4b0; --danger: #f2557a; --warning: #f0a830;
+            --card-bg: #1e293b; --text: #e2e8f0;
+            --surface-2: #273449; --border: #334155; --border-soft: #2b3a4f;
+            --muted: #94a3b8; --muted-2: #64748b; --hover: #2f3e55; --trash: #64748b;
+            --panel: #1e293b; --input-focus-bg: #0f172a; --badge-bg: #334155; --badge-text: #cbd5e1;
+            --btn-strong: #475569;
+            color-scheme: dark;
+        }
+        :root[data-theme="dark"] .login-overlay { background: rgba(2, 6, 23, 0.7); }
+        :root[data-theme="dark"] .planos-overlay { background: rgba(2, 6, 23, 0.88); }
+        :root[data-theme="dark"] .login-box { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+        :root[data-theme="dark"] .card { box-shadow: none; }
         
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 0; margin: 0; min-height: 100vh; }
@@ -34,14 +60,14 @@
             background: rgba(47, 111, 237, 0.12); display: flex; align-items: center;
             justify-content: center; font-size: 1.6em;
         }
-        .login-sub { font-size: 0.85em; color: #718096; margin: -12px 0 24px; }
+        .login-sub { font-size: 0.85em; color: var(--muted); margin: -12px 0 24px; }
         .login-box h2 { display: block; text-align: center; margin-bottom: 6px; }
         .login-box input { width: 100%; margin-bottom: 15px; }
         .login-link { margin-top: 22px; font-size: 0.85em; cursor: pointer; color: var(--secondary); font-weight: 600; }
         .login-trust {
             display: flex; align-items: center; justify-content: center; gap: 6px;
-            margin-top: 22px; padding-top: 14px; border-top: 1px solid #edf2f7;
-            font-size: 0.75em; color: #a0aec0;
+            margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border-soft);
+            font-size: 0.75em; color: var(--muted-2);
         }
         
         /* Novo Container para a Senha */
@@ -57,7 +83,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center;
-            color: #718096; /* Cor cinza do ícone */
+            color: var(--muted); /* Cor cinza do ícone */
             transition: color 0.3s;
         }
 
@@ -78,23 +104,29 @@
         
         /* Cabeçalho Topo */
         .header-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 30px; gap: 15px; }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand h1 { margin: 0; text-align: left; white-space: nowrap; }
+        .brand-logo { height: 38px; width: auto; background: #fff; border-radius: 10px; padding: 4px 7px; border: 1px solid var(--border); flex-shrink: 0; }
+        .btn-tema { background: transparent; border: 1px solid var(--border); padding: 0; width: 34px; height: 34px; border-radius: 50%; font-size: 17px; line-height: 1; color: var(--text); flex-shrink: 0; }
+        .btn-tema:hover { background: var(--hover); filter: none; }
+        .conta-dia { cursor: pointer; }
         .header-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; justify-content: flex-end; }
-        .user-panel { display: none; align-items: center; gap: 10px; background: white; padding: 8px 16px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; flex-wrap: wrap; justify-content: center; }
+        .user-panel { display: none; align-items: center; gap: 10px; background: var(--panel); padding: 8px 16px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); flex-wrap: wrap; justify-content: center; }
         
         #status-salvamento {
             font-size: 0.9em; font-weight: 700; color: var(--success);
-            background: #f8fafc; padding: 8px 16px; border-radius: 20px;
-            border: 1px solid #e2e8f0; transition: all 0.3s ease; display: none;
+            background: var(--surface-2); padding: 8px 16px; border-radius: 20px;
+            border: 1px solid var(--border); transition: all 0.3s ease; display: none;
         }
 
-        .card { background: var(--card-bg); padding: 25px; border-radius: var(--radius-card); box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #edf2f7; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: var(--radius-card); box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid var(--border-soft); }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
         
         .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
-        label { font-size: 0.85em; font-weight: 700; margin-bottom: 8px; color: #718096; text-transform: uppercase; }
-        input, select { padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95em; background: #f8fafc; transition: all 0.2s; }
-        input:focus, select:focus { border-color: var(--secondary); outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15); }
+        label { font-size: 0.85em; font-weight: 700; margin-bottom: 8px; color: var(--muted); text-transform: uppercase; }
+        input, select { padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95em; background: var(--surface-2); color: var(--text); transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--secondary); outline: none; background: var(--input-focus-bg); box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.15); }
         
         button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border: none; border-radius: var(--radius-btn); cursor: pointer; font-weight: 600; color: white; font-size: 0.95em; transition: all 0.15s ease; }
         button:hover { filter: brightness(1.05); }
@@ -112,14 +144,14 @@
         .status-pendente { background-color: rgba(217, 140, 10, 0.12); color: var(--warning); border: 1px solid var(--warning); }
         
         .resumo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .mini-card { padding: 15px; border-radius: 12px; background: #f8fafc; }
+        .mini-card { padding: 15px; border-radius: 12px; background: var(--surface-2); }
         .mini-card.restante { background: rgba(224, 41, 79, 0.06); }
-        .mini-card p { margin: 0; font-size: 0.8em; color: #718096; font-weight: bold; text-transform: uppercase; }
+        .mini-card p { margin: 0; font-size: 0.8em; color: var(--muted); font-weight: bold; text-transform: uppercase; }
         .mini-card h4 { margin: 5px 0 0 0; font-size: 1.25em; color: var(--primary); font-weight: 600; }
 
         .lista-contas { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-        .conta-card { display: flex; align-items: center; gap: 14px; background: #f8fafc; border: 1px solid #edf2f7; border-radius: 14px; padding: 13px 16px; transition: background 0.15s; }
-        .conta-card:hover { background: #eef2f7; }
+        .conta-card { display: flex; align-items: center; gap: 14px; background: var(--surface-2); border: 1px solid var(--border-soft); border-radius: 14px; padding: 13px 16px; transition: background 0.15s; }
+        .conta-card:hover { background: var(--hover); }
         .conta-card.paga { opacity: 0.65; }
         .conta-icone { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1em; }
         .conta-icone.pago { background: rgba(22, 163, 148, 0.14); }
@@ -127,30 +159,30 @@
         .conta-icone.vencido { background: rgba(224, 41, 79, 0.14); }
         .conta-info { flex: 1; min-width: 0; }
         .conta-desc { font-weight: 600; font-size: 0.95em; margin: 0; cursor: pointer; }
-        .conta-desc.paga { text-decoration: line-through; color: #a0aec0; }
-        .conta-sub { font-size: 0.8em; color: #718096; margin: 3px 0 0; }
+        .conta-desc.paga { text-decoration: line-through; color: var(--muted-2); }
+        .conta-sub { font-size: 0.8em; color: var(--muted); margin: 3px 0 0; }
         .conta-valor-wrap { text-align: right; }
         .conta-valor { font-weight: 600; font-size: 0.95em; margin: 0; cursor: pointer; }
-        .conta-valor.paga { text-decoration: line-through; color: #a0aec0; }
+        .conta-valor.paga { text-decoration: line-through; color: var(--muted-2); }
         .conta-badge { font-size: 0.72em; font-weight: 700; padding: 2px 10px; border-radius: 20px; display: inline-block; margin-top: 4px; cursor: pointer; border: none; }
         .conta-badge.pago { background: rgba(22, 163, 148, 0.14); color: var(--success); }
         .conta-badge.pendente { background: rgba(217, 140, 10, 0.14); color: var(--warning); }
         .conta-badge.vencido { background: rgba(224, 41, 79, 0.14); color: var(--danger); }
         .conta-acoes { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-        .conta-excluir { background: transparent; color: #cbd5e0; border: none; padding: 6px; font-size: 1em; box-shadow: none; }
+        .conta-excluir { background: transparent; color: var(--trash); border: none; padding: 6px; font-size: 1em; box-shadow: none; }
         .conta-excluir:hover { color: var(--danger); background: transparent; filter: none; }
         
-        .badge { background: #e2e8f0; padding: 4px 10px; border-radius: 30px; font-size: 0.75em; font-weight: 700; color: #4a5568; white-space: nowrap; }
+        .badge { background: var(--badge-bg); padding: 4px 10px; border-radius: 30px; font-size: 0.75em; font-weight: 700; color: var(--badge-text); white-space: nowrap; }
         .chart-container { position: relative; height: 35vh; width: 100%; }
         
         .header-tabela { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
         .filtro-group { display: flex; gap: 10px; align-items: center; }
-        .filtro-box { display: flex; align-items: center; gap: 5px; background: #f8fafc; padding: 6px 12px; border-radius: 30px; border: 2px solid #e2e8f0; }
+        .filtro-box { display: flex; align-items: center; gap: 5px; background: var(--surface-2); padding: 6px 12px; border-radius: 30px; border: 2px solid var(--border); }
         .filtro-box label { margin-bottom: 0; font-size: 0.8em; text-transform: none; white-space: nowrap; }
         .filtro-box select { border: none; background: transparent; padding: 0; font-weight: bold; color: var(--primary); cursor: pointer; }
         .filtro-box select:focus { box-shadow: none; }
         
-        .rodape-info { text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0; font-size: 0.9em; color: #718096; line-height: 1.6; }
+        .rodape-info { text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); font-size: 0.9em; color: var(--muted); line-height: 1.6; }
 
         /* ======== CONFIGURAÇÕES DE IMPRESSÃO ======== */
         @media print {
@@ -160,7 +192,9 @@
             .user-panel, #status-salvamento { display: none !important; }
             input, select { border: none !important; background: transparent !important; padding: 0 !important; color: black !important; font-weight: bold; -webkit-appearance: none; appearance: none; }
             body { background: white !important; color: black !important; }
-            .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin-bottom: 15px; }
+            .card { box-shadow: none !important; border: 1px solid #ccc !important; break-inside: avoid; margin-bottom: 15px; background: #fff !important; }
+            .conta-card, .mini-card { background: #fff !important; }
+            h1, h2, .mini-card h4, .conta-desc, .conta-valor { color: #000 !important; }
             .chart-container { break-inside: avoid; }
         }
         /* ======== TELA DE PLANOS ======== */
@@ -177,7 +211,7 @@
             display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;
         }
         .plano-card {
-            background: white; padding: 25px; border-radius: 12px; border: 2px solid #e2e8f0;
+            background: var(--panel); padding: 25px; border-radius: 12px; border: 2px solid var(--border);
             transition: transform 0.3s, border-color 0.3s; display: flex; flex-direction: column;
         }
         .plano-card:hover { transform: translateY(-5px); border-color: var(--secondary); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
@@ -187,8 +221,8 @@
             background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold;
         }
         .plano-preco { font-size: 2em; font-weight: 800; color: var(--primary); margin: 15px 0; }
-        .plano-mes { font-size: 0.4em; color: #718096; font-weight: normal; }
-        .btn-assinar { background: var(--primary); margin-top: auto; padding: 12px; width: 100%; }
+        .plano-mes { font-size: 0.4em; color: var(--muted); font-weight: normal; }
+        .btn-assinar { background: var(--btn-strong); margin-top: auto; padding: 12px; width: 100%; }
         .plano-card.destaque .btn-assinar { background: var(--success); }
         .btn-fechar-planos {
             position: absolute; top: 15px; right: 15px; background: transparent; color: var(--danger);
@@ -208,6 +242,7 @@
             h1 { font-size: 1.3em; }
             .header-main { flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 20px; }
             .header-actions { justify-content: center; width: 100%; }
+            .brand { justify-content: center; }
 
             .card { padding: 18px; margin-bottom: 16px; }
             .grid, .grid-4 { gap: 16px; }
@@ -260,11 +295,11 @@
 <div id="modal-recuperacao" class="login-overlay" style="display: none;">
     <div class="login-box">
         <h2>Recuperar Senha</h2>
-        <p style="font-size: 0.9em; color: #718096; margin-bottom: 20px;">Digite seus dados para receber as instruções.</p>
+        <p style="font-size: 0.9em; color: var(--muted); margin-bottom: 20px;">Digite seus dados para receber as instruções.</p>
         <input type="email" id="rec-email" placeholder="Seu E-mail" onkeydown="if(event.key==='Enter') solicitarRecuperacao();">
         <input type="text" id="rec-cpf" placeholder="Seu CPF (Somente números)" onkeydown="if(event.key==='Enter') solicitarRecuperacao();">
         <button onclick="solicitarRecuperacao()" id="btn-recuperar">Enviar Solicitação</button>
-        <button onclick="fecharModalRecuperacao()" style="background: transparent; color: #718096; margin-top: 10px; box-shadow: none; border: 1px solid #e2e8f0;">Voltar ao Login</button>
+        <button onclick="fecharModalRecuperacao()" style="background: transparent; color: var(--muted); margin-top: 10px; box-shadow: none; border: 1px solid var(--border);">Voltar ao Login</button>
         <p id="msg-rec" style="font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
     </div>
 </div>
@@ -273,11 +308,11 @@
 <div id="modal-redefinir" class="login-overlay" style="display: none;">
     <div class="login-box">
         <h2>Digite o Código</h2>
-        <p style="font-size: 0.9em; color: #718096; margin-bottom: 20px;">Enviamos um código de 6 dígitos para o seu e-mail. Ele vale por 15 minutos.</p>
+        <p style="font-size: 0.9em; color: var(--muted); margin-bottom: 20px;">Enviamos um código de 6 dígitos para o seu e-mail. Ele vale por 15 minutos.</p>
         <input type="text" id="reset-codigo" placeholder="Código de 6 dígitos" maxlength="6" inputmode="numeric" onkeydown="if(event.key==='Enter') document.getElementById('reset-nova-senha').focus();">
         <input type="password" id="reset-nova-senha" placeholder="Nova senha (mín. 6 caracteres)" maxlength="60" onkeydown="if(event.key==='Enter') confirmarRedefinicao();">
         <button onclick="confirmarRedefinicao()" id="btn-redefinir">Confirmar Nova Senha</button>
-        <button onclick="fecharModalRedefinir()" style="background: transparent; color: #718096; margin-top: 10px; box-shadow: none; border: 1px solid #e2e8f0;">Voltar ao Login</button>
+        <button onclick="fecharModalRedefinir()" style="background: transparent; color: var(--muted); margin-top: 10px; box-shadow: none; border: 1px solid var(--border);">Voltar ao Login</button>
         <p id="msg-redefinir" style="font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
     </div>
 </div>
@@ -287,34 +322,34 @@
     <div class="planos-container">
         <button class="btn-fechar-planos" onclick="fecharPlanos()">✖</button>
         <h2>🚀 Escolha seu Plano</h2>
-        <p style="color: #718096;">O seu mês de teste grátis será ativado automaticamente na primeira assinatura.</p>
+        <p style="color: var(--muted);">O seu mês de teste grátis será ativado automaticamente na primeira assinatura.</p>
         
         <div class="planos-grid">
             <div class="plano-card">
                 <h3>Mensal</h3>
                 <div class="plano-preco">R$ 9,99<span class="plano-mes">/mês</span></div>
-                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">Acesso completo com renovação a cada mês.</p>
+                <p style="font-size: 0.85em; color: var(--muted); margin-bottom: 20px;">Acesso completo com renovação a cada mês.</p>
                 <button class="btn-assinar" onclick="iniciarAssinatura('mensal')">Assinar Mensal</button>
             </div>
             
             <div class="plano-card">
                 <h3>Trimestral</h3>
                 <div class="plano-preco">R$ 26,90<span class="plano-mes">/trimestre</span></div>
-                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">~ R$ 8,96/mês. Economize 10%.</p>
+                <p style="font-size: 0.85em; color: var(--muted); margin-bottom: 20px;">~ R$ 8,96/mês. Economize 10%.</p>
                 <button class="btn-assinar" onclick="iniciarAssinatura('trimestral')">Assinar Trimestral</button>
             </div>
 
             <div class="plano-card destaque">
                 <h3>Anual</h3>
                 <div class="plano-preco">R$ 89,90<span class="plano-mes">/ano</span></div>
-                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">~ R$ 7,49/mês. Nosso plano com melhor custo-benefício (25% off).</p>
+                <p style="font-size: 0.85em; color: var(--muted); margin-bottom: 20px;">~ R$ 7,49/mês. Nosso plano com melhor custo-benefício (25% off).</p>
                 <button class="btn-assinar" onclick="iniciarAssinatura('anual')">Assinar Anual</button>
             </div>
 
             <div class="plano-card">
                 <h3>Vitalício</h3>
                 <div class="plano-preco">R$ 199,90<span class="plano-mes"> único</span></div>
-                <p style="font-size: 0.85em; color: #718096; margin-bottom: 20px;">Pague apenas uma vez e tenha acesso para sempre.</p>
+                <p style="font-size: 0.85em; color: var(--muted); margin-bottom: 20px;">Pague apenas uma vez e tenha acesso para sempre.</p>
                 <button class="btn-assinar" onclick="iniciarAssinatura('vitalicio')">Comprar Acesso</button>
             </div>
         </div>
@@ -327,11 +362,12 @@
         
         <!-- CABEÇALHO COM NOME DO USUÁRIO E LOGOUT -->
         <div class="header-main">
-            <h1>Controle Financeiro</h1>
+            <div class="brand"><img class="brand-logo" src="data:image/png;base64,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" alt="Logo NorCloud"><h1>Norcloud Financeiro</h1></div>
             <div class="header-actions">
                 <div id="user-info" class="user-panel">
                     <span style="font-size: 1.2em;">👤</span>
                     <span id="display-username" style="font-weight: 800; color: var(--primary);">Usuário</span>
+                    <button class="btn-tema" id="btn-tema" onclick="alternarTema()" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">🌙</button>
                     <button class="btn-print" style="background: var(--warning); color: #fff;" onclick="abrirPlanos()">⭐ Premium</button>
                     <button class="btn-logout" onclick="fazerLogout()">Sair</button>
                 </div>
@@ -339,7 +375,7 @@
             </div>
         </div>
 
-        <div class="card" style="background: #f8fafc; border-left: 4px solid var(--secondary);">
+        <div class="card" style="background: var(--surface-2); border-left: 4px solid var(--secondary);">
             <div class="header-tabela" style="margin-bottom: 0;">
                 <h2 style="margin: 0;">📅 Competência Atual</h2>
                 <div class="filtro-group">
@@ -437,6 +473,19 @@
 
     // Escapa caracteres HTML antes de inserir texto do usuário via innerHTML,
     // evitando XSS armazenado (ex: alguém digitar <script> na descrição de uma conta).
+    function aplicarTema(tema) {
+        document.documentElement.setAttribute('data-theme', tema);
+        const btn = document.getElementById('btn-tema');
+        if (btn) btn.innerText = tema === 'dark' ? '☀️' : '🌙';
+        if (meuGrafico) renderizarGrafico(); // recolore o gráfico
+    }
+
+    function alternarTema() {
+        const novo = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem('tema', novo); } catch (e) {}
+        aplicarTema(novo);
+    }
+
     function escapeHtml(texto) {
         return String(texto)
             .replace(/&/g, '&amp;')
@@ -846,6 +895,18 @@
                 atualizarDashboard(); 
                 autoSalvar(); 
             }
+        } else if (campo === 'venc') {
+            let novoDia = prompt(`Editar dia de pagamento (1 a 31) para ${meses[mesAtualSistema]}/${anoAtualSistema}:`, valorAtual);
+            if (novoDia !== null) {
+                novoDia = parseInt(novoDia, 10);
+                if (!isNaN(novoDia) && novoDia >= 1 && novoDia <= 31) {
+                    conta.excecoes[chave].venc = novoDia;
+                    atualizarDashboard();
+                    autoSalvar();
+                } else {
+                    alert("Digite um dia válido, entre 1 e 31.");
+                }
+            }
         } else if (campo === 'valor') {
             let novoValor = prompt(`Editar valor (R$) para ${meses[mesAtualSistema]}/${anoAtualSistema}:`, valorAtual);
             if (novoValor !== null) {
@@ -877,7 +938,9 @@
                 let descAtual = (c.excecoes && c.excecoes[chave] && c.excecoes[chave].desc !== undefined) ? c.excecoes[chave].desc : c.desc;
                 let valorAtual = (c.excecoes && c.excecoes[chave] && c.excecoes[chave].valor !== undefined) ? c.excecoes[chave].valor : c.valor;
 
-                contasExibicao.push({ ...c, parcelaCalculada, estaPaga, descAtual, valorAtual });
+                let vencAtual = (c.excecoes && c.excecoes[chave] && c.excecoes[chave].venc !== undefined) ? c.excecoes[chave].venc : c.venc;
+
+                contasExibicao.push({ ...c, parcelaCalculada, estaPaga, descAtual, valorAtual, vencAtual });
                 totalDoMes += valorAtual;
                 if(estaPaga) totalPago += valorAtual;
             }
@@ -889,14 +952,14 @@
         document.getElementById('resumo-pago').innerText = totalPago.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         document.getElementById('resumo-restante').innerText = restanteAPagar.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        contasExibicao.sort((a, b) => a.venc - b.venc).forEach(c => {
+        contasExibicao.sort((a, b) => a.vencAtual - b.vencAtual).forEach(c => {
             const hoje = new Date();
             const indiceHoje = hoje.getFullYear() * 12 + hoje.getMonth();
             const indiceView = anoAtualSistema * 12 + mesAtualSistema;
             let status = 'pendente';
             if (c.estaPaga) {
                 status = 'pago';
-            } else if (indiceView < indiceHoje || (indiceView === indiceHoje && c.venc < hoje.getDate())) {
+            } else if (indiceView < indiceHoje || (indiceView === indiceHoje && c.vencAtual < hoje.getDate())) {
                 status = 'vencido';
             }
             const iconePorStatus = { pago: '✓', pendente: '⏳', vencido: '⚠️' };
@@ -908,7 +971,7 @@
                 <div class="conta-icone ${status}">${iconePorStatus[status]}</div>
                 <div class="conta-info">
                     <p class="conta-desc${c.estaPaga ? ' paga' : ''}" onclick="editarCampo(${c.id}, 'desc')">${escapeHtml(c.descAtual)} ✏️</p>
-                    <p class="conta-sub">Parcela ${c.parcelaCalculada}/${c.totalParcelas} • Dia ${String(c.venc).padStart(2, '0')}</p>
+                    <p class="conta-sub">Parcela ${c.parcelaCalculada}/${c.totalParcelas} • <span class="conta-dia" onclick="editarCampo(${c.id}, 'venc')" title="Clique para editar o dia">Dia ${String(c.vencAtual).padStart(2, '0')} ✏️</span></p>
                 </div>
                 <div class="conta-valor-wrap">
                     <p class="conta-valor${c.estaPaga ? ' paga' : ''}" onclick="editarCampo(${c.id}, 'valor')">R$ ${c.valorAtual.toFixed(2)} ✏️</p>
@@ -921,7 +984,7 @@
             tbody.appendChild(div);
         });
 
-        if(contasExibicao.length === 0) tbody.innerHTML = `<p style="text-align:center; padding: 30px; color: #718096;">Nenhuma conta projetada.</p>`;
+        if(contasExibicao.length === 0) tbody.innerHTML = `<p style="text-align:center; padding: 30px; color: var(--muted);">Nenhuma conta projetada.</p>`;
 
         let saldoAtualNoBolso = rendaTotalMesAtual - totalPago;
         let projecaoFinal = saldoAtualNoBolso - restanteAPagar; 
@@ -962,6 +1025,10 @@
         const ctx = document.getElementById('graficoSobra').getContext('2d');
         if (meuGrafico) meuGrafico.destroy(); 
         
+        const estiloTema = getComputedStyle(document.documentElement);
+        const corTexto = estiloTema.getPropertyValue('--muted').trim() || '#718096';
+        const corGrade = estiloTema.getPropertyValue('--border-soft').trim() || 'rgba(0,0,0,0.05)';
+
         let gradientFill = ctx.createLinearGradient(0, 0, 0, 300);
         gradientFill.addColorStop(0, 'rgba(0, 180, 216, 0.3)'); 
         gradientFill.addColorStop(1, 'rgba(0, 180, 216, 0.0)');
@@ -988,12 +1055,15 @@
                 maintainAspectRatio: false, 
                 plugins: { legend: { display: false } }, 
                 scales: { 
-                    y: { grid: { color: 'rgba(0,0,0,0.03)' }, beginAtZero: true }, 
-                    x: { grid: { display: false } } 
+                    y: { grid: { color: corGrade }, ticks: { color: corTexto }, beginAtZero: true }, 
+                    x: { grid: { display: false }, ticks: { color: corTexto } } 
                 } 
             }
         });
     }
+
+    // Ajusta o ícone do botão de tema conforme o tema já aplicado no <head>
+    (function () { const btn = document.getElementById('btn-tema'); if (btn) btn.innerText = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; })();
 
     // --- FUNÇÕES DE ASSINATURA ---
     function abrirPlanos() {
