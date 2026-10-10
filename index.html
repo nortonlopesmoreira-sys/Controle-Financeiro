@@ -184,9 +184,52 @@
         
         .rodape-info { text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border); font-size: 0.9em; color: var(--muted); line-height: 1.6; }
 
+        /* Lista aberta dos selects (Mês/Ano...) legível nos dois temas */
+        select option, select optgroup { background-color: var(--card-bg); color: var(--text); }
+        input:-webkit-autofill, input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+            -webkit-text-fill-color: var(--text);
+            caret-color: var(--text);
+        }
+
+        /* ======== JANELAS (substituem as caixas feias do navegador) ======== */
+        .dialogo-overlay {
+            position: fixed; inset: 0; z-index: 20000; display: none; align-items: center; justify-content: center;
+            background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px); padding: 20px;
+        }
+        .dialogo-box {
+            background: var(--card-bg); color: var(--text); border: 1px solid var(--border);
+            border-radius: var(--radius-card); box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            width: 100%; max-width: 380px; padding: 24px;
+        }
+        .dialogo-box h3 { margin: 0 0 6px; font-size: 1.1em; color: var(--primary); }
+        .dialogo-box p { margin: 0 0 14px; font-size: 0.9em; color: var(--muted); line-height: 1.45; }
+        .dialogo-box input { width: 100%; margin-bottom: 16px; }
+        .dialogo-botoes { display: flex; gap: 10px; justify-content: flex-end; }
+        .dialogo-botoes button { padding: 10px 20px; }
+        .dialogo-ok { background: var(--secondary); }
+        .dialogo-ok.perigo { background: var(--danger); }
+        .dialogo-cancelar { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .dialogo-cancelar:hover { background: var(--hover); filter: none; }
+
+        /* ======== COPIAR CONTA / AVISO RÁPIDO ======== */
+        .conta-copiar { background: transparent; color: var(--trash); border: none; padding: 6px; font-size: 1em; box-shadow: none; }
+        .conta-copiar:hover { color: var(--secondary); background: transparent; filter: none; }
+        .clonar-linha { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
+        .dialogo-box .form-group { margin-bottom: 12px; }
+        .dialogo-box .form-group input, .dialogo-box .form-group select { width: 100%; margin-bottom: 0; }
+        .clonar-previa { font-size: 0.85em; color: var(--secondary) !important; font-weight: 600; margin: 0 0 16px !important; }
+        .toast {
+            position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 30000;
+            background: var(--btn-strong); color: #fff; padding: 12px 18px; border-radius: 12px;
+            font-size: 0.9em; max-width: 90%; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s;
+        }
+        .toast.visivel { opacity: 1; transform: translate(-50%, 0); }
+
         /* ======== CONFIGURAÇÕES DE IMPRESSÃO ======== */
         @media print {
-            .login-overlay, #modal-recuperacao, #modal-redefinir { display: none !important; }
+            .login-overlay, #modal-recuperacao, #modal-redefinir, .dialogo-overlay, .toast { display: none !important; }
             #app-wrapper { filter: none !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
             button:not(.btn-status) { display: none !important; } 
             .user-panel, #status-salvamento { display: none !important; }
@@ -255,6 +298,7 @@
             .lista-contas { gap: 12px; }
             .conta-card { padding: 12px 14px; gap: 12px; }
             .conta-sub { margin-top: 4px; }
+            .conta-acoes { flex-direction: column; gap: 0; }
 
             .header-tabela { gap: 12px; }
             .filtro-group { flex-wrap: wrap; }
@@ -316,6 +360,41 @@
         <p id="msg-redefinir" style="font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
     </div>
 </div>
+
+<!-- JANELA: COPIAR CONTA PARA OUTROS MESES -->
+<div id="clonar-overlay" class="dialogo-overlay" role="dialog" aria-modal="true" aria-labelledby="clonar-titulo"
+     onclick="if(event.target===this) fecharClonar();"
+     onkeydown="if(event.key==='Escape') fecharClonar(); else if(event.key==='Enter' && event.target.id==='clonar-qtd') confirmarClonar();">
+    <div class="dialogo-box">
+        <h3 id="clonar-titulo">Copiar conta para outros meses</h3>
+        <p id="clonar-resumo"></p>
+        <div class="clonar-linha">
+            <div class="form-group"><label>Começar em</label><select id="clonar-mes" onchange="atualizarPreviaClonar()"></select></div>
+            <div class="form-group"><label>Ano</label><select id="clonar-ano" onchange="atualizarPreviaClonar()"></select></div>
+        </div>
+        <div class="form-group"><label>Repetir por quantos meses?</label><input type="number" id="clonar-qtd" min="1" max="120" inputmode="numeric" oninput="atualizarPreviaClonar()"></div>
+        <p id="clonar-previa" class="clonar-previa"></p>
+        <div class="dialogo-botoes">
+            <button type="button" class="dialogo-cancelar" onclick="fecharClonar()">Cancelar</button>
+            <button type="button" class="dialogo-ok" onclick="confirmarClonar()">Copiar</button>
+        </div>
+    </div>
+</div>
+
+<!-- JANELA GENÉRICA (editar valores, confirmar, avisos) -->
+<div id="dialogo-overlay" class="dialogo-overlay" role="dialog" aria-modal="true" aria-labelledby="dialogo-titulo">
+    <div class="dialogo-box">
+        <h3 id="dialogo-titulo"></h3>
+        <p id="dialogo-msg"></p>
+        <input type="text" id="dialogo-input" autocomplete="off">
+        <div class="dialogo-botoes">
+            <button type="button" id="dialogo-cancelar" class="dialogo-cancelar">Cancelar</button>
+            <button type="button" id="dialogo-ok" class="dialogo-ok">OK</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <!-- TELA DE ASSINATURA -->
 <div id="planos-overlay" class="planos-overlay">
@@ -473,6 +552,167 @@
 
     // Escapa caracteres HTML antes de inserir texto do usuário via innerHTML,
     // evitando XSS armazenado (ex: alguém digitar <script> na descrição de uma conta).
+    // ======== JANELAS (no lugar de prompt / confirm / alert do navegador) ========
+    let _dialogoResolver = null;
+
+    function _fecharDialogo(resultado) {
+        document.getElementById('dialogo-overlay').style.display = 'none';
+        const r = _dialogoResolver;
+        _dialogoResolver = null;
+        if (r) r(resultado);
+    }
+
+    function _abrirDialogo(op) {
+        return new Promise(resolve => {
+            if (_dialogoResolver) _fecharDialogo(null);
+            _dialogoResolver = resolve;
+
+            const overlay = document.getElementById('dialogo-overlay');
+            const inp = document.getElementById('dialogo-input');
+            const ok = document.getElementById('dialogo-ok');
+            const cancelar = document.getElementById('dialogo-cancelar');
+
+            document.getElementById('dialogo-titulo').textContent = op.titulo || '';
+            const msg = document.getElementById('dialogo-msg');
+            msg.textContent = op.mensagem || '';
+            msg.style.display = op.mensagem ? 'block' : 'none';
+
+            inp.style.display = op.comInput ? 'block' : 'none';
+            inp.value = op.comInput ? String(op.valorInicial ?? '') : '';
+            inp.inputMode = op.inputMode || 'text';
+
+            ok.textContent = op.textoOk || 'OK';
+            ok.className = 'dialogo-ok' + (op.perigo ? ' perigo' : '');
+            cancelar.textContent = op.textoCancelar || 'Cancelar';
+            cancelar.style.display = op.mostrarCancelar === false ? 'none' : '';
+
+            const confirmarAcao = () => _fecharDialogo(op.comInput ? inp.value : true);
+            const cancelarAcao = () => _fecharDialogo(op.comInput ? null : false);
+
+            ok.onclick = confirmarAcao;
+            cancelar.onclick = cancelarAcao;
+            overlay.onclick = (e) => { if (e.target === overlay) cancelarAcao(); };
+            overlay.onkeydown = (e) => {
+                if (e.key === 'Escape') { e.preventDefault(); cancelarAcao(); }
+                else if (e.key === 'Enter' && e.target === inp) { e.preventDefault(); confirmarAcao(); }
+            };
+
+            overlay.style.display = 'flex';
+            setTimeout(() => { if (op.comInput) { inp.focus(); inp.select(); } else { ok.focus(); } }, 30);
+        });
+    }
+
+    // Retorna o texto digitado, ou null se cancelar
+    function dialogoPrompt(titulo, mensagem, valorInicial, inputMode) {
+        return _abrirDialogo({ titulo, mensagem, comInput: true, valorInicial, inputMode, textoOk: 'Salvar' });
+    }
+    // Retorna true/false
+    function dialogoConfirm(titulo, mensagem, textoOk, perigo, textoCancelar) {
+        return _abrirDialogo({ titulo, mensagem, textoOk: textoOk || 'Confirmar', perigo: !!perigo, textoCancelar });
+    }
+    function dialogoAlert(titulo, mensagem) {
+        return _abrirDialogo({ titulo, mensagem, mostrarCancelar: false });
+    }
+
+    // Dia de pagamento de uma conta em um mês: exceção daquele mês > última mudança "a partir de" > dia original
+    function vencimentoDoMes(c, ano, mes) {
+        const chave = `${ano}-${mes}`;
+        if (c.excecoes && c.excecoes[chave] && c.excecoes[chave].venc !== undefined) return c.excecoes[chave].venc;
+        let dia = c.venc;
+        if (c.vencMudancas) {
+            const idx = ano * 12 + mes;
+            let melhor = -Infinity;
+            Object.keys(c.vencMudancas).forEach(k => {
+                const i = parseInt(k, 10);
+                if (i <= idx && i > melhor) { melhor = i; dia = c.vencMudancas[k]; }
+            });
+        }
+        return dia;
+    }
+
+    // ======== AVISO RÁPIDO (some sozinho) ========
+    let _timerToast = null;
+    function mostrarAviso(texto) {
+        const el = document.getElementById('toast');
+        el.textContent = texto;
+        el.classList.add('visivel');
+        clearTimeout(_timerToast);
+        _timerToast = setTimeout(() => el.classList.remove('visivel'), 4000);
+    }
+
+    // ======== COPIAR CONTA PARA OUTROS MESES ========
+    // Cria uma nova conta com os mesmos dados que aparecem no mês em tela (descrição, valor e dia),
+    // começando no mês escolhido e repetindo pela quantidade de meses informada.
+    let _clonarDados = null;
+
+    function abrirClonar(id) {
+        const conta = appData.contas.find(c => c.id === id);
+        if (!conta) return;
+        const exc = (conta.excecoes && conta.excecoes[chaveCompetencia()]) || {};
+        _clonarDados = {
+            desc: exc.desc !== undefined ? exc.desc : conta.desc,
+            valor: exc.valor !== undefined ? exc.valor : conta.valor,
+            dia: vencimentoDoMes(conta, anoAtualSistema, mesAtualSistema)
+        };
+
+        // início sugerido: mês seguinte ao que está na tela; repete até dezembro
+        let mes = mesAtualSistema + 1, ano = anoAtualSistema;
+        if (mes > 11) { mes = 0; ano++; }
+
+        document.getElementById('clonar-mes').innerHTML = meses.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+        let opcoesAno = '';
+        for (let a = anoAtualSistema - 1; a <= anoAtualSistema + 5; a++) opcoesAno += `<option value="${a}">${a}</option>`;
+        document.getElementById('clonar-ano').innerHTML = opcoesAno;
+        document.getElementById('clonar-mes').value = mes;
+        document.getElementById('clonar-ano').value = ano;
+        document.getElementById('clonar-qtd').value = Math.max(1, 12 - mes);
+
+        const valorFmt = _clonarDados.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('clonar-resumo').textContent = `${_clonarDados.desc} • ${valorFmt} • todo dia ${String(_clonarDados.dia).padStart(2, '0')}`;
+
+        atualizarPreviaClonar();
+        document.getElementById('clonar-overlay').style.display = 'flex';
+        setTimeout(() => { const q = document.getElementById('clonar-qtd'); q.focus(); q.select(); }, 30);
+    }
+
+    function _periodoClonar() {
+        const mes = parseInt(document.getElementById('clonar-mes').value, 10);
+        const ano = parseInt(document.getElementById('clonar-ano').value, 10);
+        const txt = document.getElementById('clonar-qtd').value.trim();
+        const qtd = /^\d{1,3}$/.test(txt) ? parseInt(txt, 10) : NaN;
+        if (isNaN(qtd) || qtd < 1 || qtd > 120) return { mes, ano, qtd: NaN };
+        const fim = ano * 12 + mes + qtd - 1;
+        const rotulo = `${meses[mes]}/${ano}`;
+        const rotuloFim = `${meses[fim % 12]}/${Math.floor(fim / 12)}`;
+        return { mes, ano, qtd, texto: qtd === 1 ? `Vai aparecer só em ${rotulo}.` : `Vai aparecer de ${rotulo} até ${rotuloFim} (${qtd} meses).` };
+    }
+
+    function atualizarPreviaClonar() {
+        const p = _periodoClonar();
+        document.getElementById('clonar-previa').textContent = isNaN(p.qtd) ? 'Informe de 1 a 120 meses.' : p.texto;
+    }
+
+    function fecharClonar() {
+        document.getElementById('clonar-overlay').style.display = 'none';
+        _clonarDados = null;
+    }
+
+    function confirmarClonar() {
+        if (!_clonarDados) return;
+        const p = _periodoClonar();
+        if (isNaN(p.qtd)) { dialogoAlert('Quantidade inválida', 'Digite de 1 a 120 meses.'); return; }
+
+        appData.contas.push({
+            id: Date.now(), desc: _clonarDados.desc, valor: _clonarDados.valor, venc: _clonarDados.dia,
+            mesBase: p.mes, anoBase: p.ano, parcelaAtual: 1, totalParcelas: p.qtd, pagas: [], excecoes: {}
+        });
+        const texto = p.texto;
+        fecharClonar();
+        atualizarDashboard();
+        autoSalvar();
+        mostrarAviso('Conta copiada! ' + texto);
+    }
+
     function aplicarTema(tema) {
         document.documentElement.setAttribute('data-theme', tema);
         const btn = document.getElementById('btn-tema');
@@ -655,8 +895,8 @@
     }
 
     // LOGOUT
-    function fazerLogout() {
-        if(confirm("Deseja realmente sair?")) {
+    async function fazerLogout() {
+        if(await dialogoConfirm('Sair do sistema', 'Deseja realmente sair?', 'Sair', true)) {
             sessionUser = ""; 
             sessionPass = "";
             appData = { rendas: {}, contas: [] };
@@ -821,25 +1061,29 @@
     // Pergunta se o valor da renda (minha ou do cônjuge) deve ser repetido
     // nos meses restantes do ano corrente (o ano seguinte fica de fora de propósito,
     // já que costuma vir com reajuste).
-    function perguntarReplicarRenda(tipo) {
+    async function perguntarReplicarRenda(tipo) {
         const idInput = tipo === 'minha' ? 'renda-minha' : 'renda-esposa';
         const valor = parseFloat(document.getElementById(idInput).value) || 0;
+        const anoRef = anoAtualSistema, mesRef = mesAtualSistema;
 
         if (valor <= 0) return;
-        if (mesAtualSistema >= 11) return; // já é dezembro, não há meses restantes no ano
+        if (mesRef >= 11) return; // já é dezembro, não há meses restantes no ano
 
         const nomeCampo = tipo === 'minha' ? 'sua renda' : 'a renda do cônjuge';
         const valorFormatado = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        const confirmar = confirm(`Repetir ${nomeCampo} (${valorFormatado}) para os meses restantes de ${anoAtualSistema} (até dezembro)?`);
+        const confirmar = await dialogoConfirm(
+            'Repetir nos próximos meses?',
+            `Repetir ${nomeCampo} (${valorFormatado}) para os meses restantes de ${anoRef} (até dezembro)?`,
+            'Sim, repetir', false, 'Não');
         if (!confirmar) return;
 
-        if (!appData.rendas[anoAtualSistema]) appData.rendas[anoAtualSistema] = {};
+        if (!appData.rendas[anoRef]) appData.rendas[anoRef] = {};
 
-        for (let m = mesAtualSistema + 1; m <= 11; m++) {
-            if (!appData.rendas[anoAtualSistema][m]) {
-                appData.rendas[anoAtualSistema][m] = { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 };
+        for (let m = mesRef + 1; m <= 11; m++) {
+            if (!appData.rendas[anoRef][m]) {
+                appData.rendas[anoRef][m] = { minha: 0, esposa: 0, extraMeu: 0, extraEsposa: 0 };
             }
-            appData.rendas[anoAtualSistema][m][tipo] = valor;
+            appData.rendas[anoRef][m][tipo] = valor;
         }
 
         autoSalvar();
@@ -854,7 +1098,7 @@
         let parcelaAtual = parseInt(document.getElementById('parcela-atual').value) || 1;
         let totalParcelas = parseInt(document.getElementById('total-parcelas').value) || 1;
 
-        if (!desc || isNaN(valor) || isNaN(venc)) { alert("Preencha os dados corretamente!"); return; }
+        if (!desc || isNaN(valor) || isNaN(venc)) { dialogoAlert('Atenção', 'Preencha os dados corretamente!'); return; }
 
         appData.contas.push({ id: Date.now(), desc, valor, venc, mesBase, anoBase, parcelaAtual, totalParcelas, pagas: [], excecoes: {} });
         document.getElementById('desc-conta').value = ''; document.getElementById('valor-conta').value = '';
@@ -862,8 +1106,8 @@
         autoSalvar(); 
     }
 
-    function removerConta(id) {
-        if(confirm("Deseja mesmo excluir esta conta permanentemente?")) {
+    async function removerConta(id) {
+        if(await dialogoConfirm('Excluir conta', 'Deseja mesmo excluir esta conta permanentemente?', 'Excluir', true)) {
             appData.contas = appData.contas.filter(c => c.id !== id);
             atualizarDashboard();
             autoSalvar(); 
@@ -880,41 +1124,57 @@
         autoSalvar(); 
     }
 
-    function editarCampo(id, campo) {
-        let chave = chaveCompetencia();
-        let conta = appData.contas.find(c => c.id === id);
-        if (!conta.excecoes) conta.excecoes = {};
-        if (!conta.excecoes[chave]) conta.excecoes[chave] = {};
-        
-        let valorAtual = conta.excecoes[chave][campo] !== undefined ? conta.excecoes[chave][campo] : conta[campo];
+    async function editarCampo(id, campo) {
+        const chave = chaveCompetencia();
+        const conta = appData.contas.find(c => c.id === id);
+        if (!conta) return;
+        const mesTxt = `${meses[mesAtualSistema]}/${anoAtualSistema}`;
+        const excecaoDoMes = () => {
+            if (!conta.excecoes) conta.excecoes = {};
+            if (!conta.excecoes[chave]) conta.excecoes[chave] = {};
+            return conta.excecoes[chave];
+        };
+        const lerAtual = (c) => (conta.excecoes && conta.excecoes[chave] && conta.excecoes[chave][c] !== undefined) ? conta.excecoes[chave][c] : conta[c];
 
         if (campo === 'desc') {
-            let novoDesc = prompt(`Editar descrição para ${meses[mesAtualSistema]}/${anoAtualSistema}:`, valorAtual);
-            if (novoDesc !== null && novoDesc.trim() !== "") { 
-                conta.excecoes[chave].desc = novoDesc.trim(); 
-                atualizarDashboard(); 
-                autoSalvar(); 
+            const novoDesc = await dialogoPrompt('Editar descrição', `Nome da conta em ${mesTxt}:`, lerAtual('desc'), 'text');
+            if (novoDesc !== null && novoDesc.trim() !== "") {
+                excecaoDoMes().desc = novoDesc.trim();
+                atualizarDashboard();
+                autoSalvar();
             }
         } else if (campo === 'venc') {
-            let novoDia = prompt(`Editar dia de pagamento (1 a 31) para ${meses[mesAtualSistema]}/${anoAtualSistema}:`, valorAtual);
-            if (novoDia !== null) {
-                novoDia = parseInt(novoDia, 10);
-                if (!isNaN(novoDia) && novoDia >= 1 && novoDia <= 31) {
-                    conta.excecoes[chave].venc = novoDia;
+            const entrada = await dialogoPrompt('Editar dia de pagamento',
+                `Novo dia (1 a 31). Vale a partir de ${mesTxt} para todas as parcelas seguintes.`,
+                vencimentoDoMes(conta, anoAtualSistema, mesAtualSistema), 'numeric');
+            if (entrada !== null) {
+                const texto = entrada.trim();
+                const novoDia = parseInt(texto, 10);
+                if (/^\d{1,2}$/.test(texto) && novoDia >= 1 && novoDia <= 31) {
+                    const idx = anoAtualSistema * 12 + mesAtualSistema;
+                    if (!conta.vencMudancas) conta.vencMudancas = {};
+                    conta.vencMudancas[idx] = novoDia;
+                    // ajustes manuais antigos deste mês em diante deixam de valer (seguem o novo dia)
+                    if (conta.excecoes) {
+                        Object.keys(conta.excecoes).forEach(k => {
+                            const [a, m] = k.split('-').map(Number);
+                            if (a * 12 + m >= idx && conta.excecoes[k].venc !== undefined) delete conta.excecoes[k].venc;
+                        });
+                    }
                     atualizarDashboard();
                     autoSalvar();
                 } else {
-                    alert("Digite um dia válido, entre 1 e 31.");
+                    dialogoAlert('Dia inválido', 'Digite um dia entre 1 e 31.');
                 }
             }
         } else if (campo === 'valor') {
-            let novoValor = prompt(`Editar valor (R$) para ${meses[mesAtualSistema]}/${anoAtualSistema}:`, valorAtual);
-            if (novoValor !== null) {
-                novoValor = parseFloat(novoValor.replace(',', '.'));
-                if (!isNaN(novoValor)) { 
-                    conta.excecoes[chave].valor = novoValor; 
-                    atualizarDashboard(); 
-                    autoSalvar(); 
+            const entrada = await dialogoPrompt('Editar valor', `Valor (R$) em ${mesTxt}:`, lerAtual('valor'), 'decimal');
+            if (entrada !== null) {
+                const novoValor = parseFloat(entrada.replace(',', '.'));
+                if (!isNaN(novoValor)) {
+                    excecaoDoMes().valor = novoValor;
+                    atualizarDashboard();
+                    autoSalvar();
                 }
             }
         }
@@ -938,7 +1198,7 @@
                 let descAtual = (c.excecoes && c.excecoes[chave] && c.excecoes[chave].desc !== undefined) ? c.excecoes[chave].desc : c.desc;
                 let valorAtual = (c.excecoes && c.excecoes[chave] && c.excecoes[chave].valor !== undefined) ? c.excecoes[chave].valor : c.valor;
 
-                let vencAtual = (c.excecoes && c.excecoes[chave] && c.excecoes[chave].venc !== undefined) ? c.excecoes[chave].venc : c.venc;
+                let vencAtual = vencimentoDoMes(c, anoAtualSistema, mesAtualSistema);
 
                 contasExibicao.push({ ...c, parcelaCalculada, estaPaga, descAtual, valorAtual, vencAtual });
                 totalDoMes += valorAtual;
@@ -978,6 +1238,7 @@
                     <button class="btn-status conta-badge ${status}" onclick="togglePago(${c.id})">${textoPorStatus[status]}</button>
                 </div>
                 <div class="conta-acoes">
+                    <button class="conta-copiar" onclick="abrirClonar(${c.id})" title="Copiar esta conta para outros meses" aria-label="Copiar conta para outros meses">📋</button>
                     <button class="conta-excluir" onclick="removerConta(${c.id})" title="Excluir conta" aria-label="Excluir conta">🗑️</button>
                 </div>
             `;
@@ -1080,7 +1341,7 @@
             // Chama a função Java passando o nome do plano
             AndroidApp.abrirTelaDePagamento(planoEscolhido);
         } else {
-            alert("Atenção: A compra de assinaturas deve ser feita através do nosso Aplicativo Oficial no Android.");
+            dialogoAlert('Assinatura', 'A compra de assinaturas deve ser feita através do nosso Aplicativo Oficial no Android.');
         }
     }
 </script>
