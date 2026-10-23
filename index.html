@@ -345,6 +345,7 @@
             <button type="submit" id="btn-login">Entrar no sistema</button>
         </form>
         <p id="msg-login" style="color: var(--danger); font-size: 0.9em; margin-top: 15px; font-weight: bold;"></p>
+        <p id="link-trocar-usuario" class="login-link" style="display: none;" onclick="esquecerUsuario()">Não é você? Usar outro usuário</p>
         <p class="login-link" onclick="abrirModalCadastro()">Criar conta grátis (30 dias)</p>
         <p class="login-link" onclick="abrirModalRecuperacao()">Esqueci minha senha</p>
         <div class="login-trust">🔒 Conexão segura</div>
@@ -1063,6 +1064,7 @@
         document.getElementById('status-salvamento').style.display = 'none';
         document.getElementById('app-wrapper').classList.add('is-blurred');
         document.getElementById('login-overlay').style.display = 'flex';
+        preencherUltimoUsuario();
     }
 
     async function fazerLogout() {
@@ -1232,6 +1234,7 @@
 
             if(result.status === 'success') {
                 sessionPass = pass; sessionMetodo = 'senha';
+                lembrarUsuario(user);
                 aplicarLoginSucesso(result);
                 oferecerSalvarSenha(user, pass);
             } else if(result.status === 'expired') {
@@ -1243,6 +1246,37 @@
             }
         } catch(error) { msg.innerText = "Erro de conexão."; } 
         finally { btn.disabled = false; btn.innerText = "Entrar no sistema"; }
+    }
+
+    // ======== LEMBRAR O ÚLTIMO USUÁRIO (só o nome; a senha nunca é guardada pelo sistema) ========
+    function lembrarUsuario(user) {
+        try { localStorage.setItem('ultimo_usuario', user); } catch (e) {}
+    }
+
+    // Preenche o usuário usado por último e já deixa o cursor na senha
+    function preencherUltimoUsuario() {
+        let ultimo = '';
+        try { ultimo = localStorage.getItem('ultimo_usuario') || ''; } catch (e) {}
+        const campoUser = document.getElementById('inp-user');
+        const link = document.getElementById('link-trocar-usuario');
+        if (ultimo) {
+            campoUser.value = ultimo;
+            link.style.display = 'block';
+        } else {
+            link.style.display = 'none';
+        }
+        // No celular não abre o teclado sozinho; no computador já posiciona o cursor
+        const computador = typeof matchMedia === 'function' ? matchMedia('(pointer: fine)').matches : true;
+        if (computador) document.getElementById(ultimo ? 'inp-pass' : 'inp-user').focus();
+    }
+
+    // "Não é você?": esquece o usuário guardado (útil em computador compartilhado)
+    function esquecerUsuario() {
+        try { localStorage.removeItem('ultimo_usuario'); } catch (e) {}
+        document.getElementById('inp-user').value = '';
+        document.getElementById('inp-pass').value = '';
+        document.getElementById('link-trocar-usuario').style.display = 'none';
+        document.getElementById('inp-user').focus();
     }
 
     // ======== SALVAR SENHA NO NAVEGADOR / CONTA GOOGLE ========
@@ -1653,6 +1687,7 @@
         }
     }
 
+    preencherUltimoUsuario();
     carregarGoogle();
 </script>
 </body>
